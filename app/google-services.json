@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "250366404766",
+    "project_id": "nichihab-7cb67",
+    "storage_bucket": "nichihab-7cb67.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:250366404766:android:8f4dabae7ac542e1eeb38f",
+        "android_client_info": {
+          "package_name": "com.nichihab.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPetVNsY-woi6ZDLqjuqCBWH4eEchHtCo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
