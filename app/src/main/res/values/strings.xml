@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">NichiHab</string>
+    <string name="navigation_home">Home</string>
+    <string name="navigation_stats">Stats</string>
+    <string name="navigation_settings">Settings</string>
+    <string name="settings_api_title">AI Provider</string>
+    <string name="settings_api_key_label">API Key</string>
+    <string name="settings_api_key_hint">Enter your API key</string>
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_save">Save</string>
+    <string name="settings_provider_anthropic">Anthropic (Claude)</string>
+    <string name="settings_provider_gemini">Google (Gemini)</string>
+    <string name="api_key_saved">API key saved securely</string>
+    <string name="api_key_cleared">API key cleared</string>
+    <string name="api_key_required">Please enter an API key first</string>
+    <string name="hard_strictness_desc">Blocks apps and prevents uninstall/settings bypass. You cannot escape a session.</string>
+    <string name="accessibility_service_description">NichiHab uses this service to detect which app is currently in the foreground and block access to selected apps during your scheduled focus sessions. This service does not collect, store, or transmit any personal data.</string>
+</resources>
