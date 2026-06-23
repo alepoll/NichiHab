@@ -203,7 +203,7 @@ fun TimeWindowPage(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Tap the times above, then use the +/- buttons to adjust",
+                                text = s.get("time_adjust_hint"),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -211,16 +211,16 @@ fun TimeWindowPage(
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                TimeAdjustButton("Start -1h") {
+                                TimeAdjustButton(s.get("start_minus_1h")) {
                                     onCustomStartChanged((customStartHour - 1 + 24) % 24, customStartMinute)
                                 }
-                                TimeAdjustButton("Start +1h") {
+                                TimeAdjustButton(s.get("start_plus_1h")) {
                                     onCustomStartChanged((customStartHour + 1) % 24, customStartMinute)
                                 }
-                                TimeAdjustButton("End -1h") {
+                                TimeAdjustButton(s.get("end_minus_1h")) {
                                     onCustomEndChanged((customEndHour - 1 + 24) % 24, customEndMinute)
                                 }
-                                TimeAdjustButton("End +1h") {
+                                TimeAdjustButton(s.get("end_plus_1h")) {
                                     onCustomEndChanged((customEndHour + 1) % 24, customEndMinute)
                                 }
                             }
@@ -280,17 +280,18 @@ private fun TimePickerDialog(
     onDismiss: () -> Unit,
     onConfirm: (Int, Int) -> Unit
 ) {
+    val s = LocalStrings.current
     val state = rememberTimePickerState(initialHour = initialHour, initialMinute = initialMinute)
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = { onConfirm(state.hour, state.minute) }) {
-                Text("OK")
+                Text(s.get("ok"))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(s.get("cancel"))
             }
         },
         text = {

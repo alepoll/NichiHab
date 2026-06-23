@@ -125,6 +125,7 @@ private fun TaskSuggestionCard(
     onEdit: () -> Unit,
     onRemove: (() -> Unit)?
 ) {
+    val s = LocalStrings.current
     val containerColor by animateColorAsState(
         targetValue = if (task.isSelected) MaterialTheme.colorScheme.primaryContainer
         else MaterialTheme.colorScheme.surfaceContainer,
@@ -161,7 +162,7 @@ private fun TaskSuggestionCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "~${task.estimatedMinutes} min",
+                    text = "~${task.estimatedMinutes} ${s.get("min_abbr")}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -170,7 +171,7 @@ private fun TaskSuggestionCard(
             IconButton(onClick = onEdit, modifier = Modifier.size(36.dp)) {
                 Icon(
                     Icons.Default.Edit,
-                    contentDescription = "Edit",
+                    contentDescription = s.get("edit_task"),
                     modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -180,7 +181,7 @@ private fun TaskSuggestionCard(
                 IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) {
                     Icon(
                         Icons.Default.Delete,
-                        contentDescription = "Remove",
+                        contentDescription = s.get("remove"),
                         modifier = Modifier.size(18.dp),
                         tint = MaterialTheme.colorScheme.error
                     )
@@ -190,7 +191,7 @@ private fun TaskSuggestionCard(
             if (task.isSelected) {
                 Icon(
                     Icons.Default.Check,
-                    contentDescription = "Selected",
+                    contentDescription = s.get("selected"),
                     modifier = Modifier.size(20.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -231,11 +232,11 @@ private fun EditingTaskCard(
             Spacer(modifier = Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                 IconButton(onClick = onCancel, modifier = Modifier.size(36.dp)) {
-                    Icon(Icons.Default.Close, "Cancel", modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Close, s.get("cancel"), modifier = Modifier.size(18.dp))
                 }
                 IconButton(onClick = onSave, modifier = Modifier.size(36.dp)) {
                     Icon(
-                        Icons.Default.Check, "Save",
+                        Icons.Default.Check, s.get("save_key"),
                         modifier = Modifier.size(18.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )

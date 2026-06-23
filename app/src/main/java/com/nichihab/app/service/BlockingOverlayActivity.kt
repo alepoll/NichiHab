@@ -64,6 +64,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import javax.inject.Inject
 import com.nichihab.app.data.local.datastore.SettingsDataStore
+import com.nichihab.app.util.LocalStrings
 import kotlinx.coroutines.flow.first
 
 @AndroidEntryPoint
@@ -148,10 +149,11 @@ private fun BlockingOverlayContent(
     settingsDataStore: SettingsDataStore,
     onVerifyClick: () -> Unit
 ) {
+    val s = LocalStrings.current
     var countdownText by remember { mutableStateOf("--:--") }
     var showCountdown by remember { mutableStateOf(true) }
     var secondsRemaining by remember { mutableLongStateOf(0L) }
-    var currentTaskTitle by remember { mutableStateOf("Complete your task") }
+    var currentTaskTitle by remember { mutableStateOf(s.get("complete_your_task")) }
 
     val context = androidx.compose.ui.platform.LocalContext.current
     var earnedTimeAvailable by remember { mutableLongStateOf(0L) }
@@ -168,7 +170,7 @@ private fun BlockingOverlayContent(
                 context.startActivity(intent)
                 (context as? android.app.Activity)?.finish()
             } else {
-                android.widget.Toast.makeText(context, "Camera permission is required to verify", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(context, s.get("camera_required_toast"), android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     )
@@ -258,7 +260,7 @@ private fun BlockingOverlayContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Blocked by NichiHab",
+            text = s.get("blocked_by_app"),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = StatusLocked
@@ -267,7 +269,7 @@ private fun BlockingOverlayContent(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "This app is restricted during your active focus session.",
+            text = s.get("restricted_during_session"),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -285,14 +287,14 @@ private fun BlockingOverlayContent(
         )
         
         Text(
-            text = "is required to earn",
+            text = s.get("required_to_earn"),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
         
         Text(
-            text = "🎁 10 min unlock",
+            text = s.get("unlock_minutes"),
             style = MaterialTheme.typography.titleMedium,
             color = androidx.compose.ui.graphics.Color(0xFF4CAF50),
             fontWeight = FontWeight.Bold,
@@ -310,7 +312,7 @@ private fun BlockingOverlayContent(
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
-                text = "until window ends",
+                text = s.get("until_window_ends"),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline
             )
@@ -345,12 +347,12 @@ private fun BlockingOverlayContent(
             ) {
                 Icon(Icons.Default.CameraAlt, null, modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.size(8.dp))
-                Text("Verify Now", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text(s.get("verify_now"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
             }
         } else {
             // No API key configured
             Text(
-                text = "⚠️ Configure your API key in Settings to use verification",
+                text = s.get("configure_api_key_warning"),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
@@ -383,7 +385,7 @@ private fun BlockingOverlayContent(
             ) {
                 Icon(Icons.Default.LockOpen, null, modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.size(8.dp))
-                Text("Use Earned Time (%d:%02d)".format(earnedMins, earnedSecs), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(s.get("use_earned_time_format").format(earnedMins, earnedSecs), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
         }
     }

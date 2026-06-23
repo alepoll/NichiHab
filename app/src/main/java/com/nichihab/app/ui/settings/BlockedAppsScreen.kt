@@ -81,7 +81,7 @@ fun BlockedAppsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onNavigateBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, s.get("back"))
             }
             Spacer(modifier = Modifier.width(8.dp))
             Column {

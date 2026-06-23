@@ -55,6 +55,7 @@ import com.nichihab.app.domain.model.RewardTier
 import com.nichihab.app.ui.theme.StatusLocked
 import com.nichihab.app.ui.theme.StatusVerified
 import com.nichihab.app.ui.theme.StreakGold
+import com.nichihab.app.util.LocalStrings
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -68,6 +69,7 @@ fun VerificationResultScreen(
     onRetry: () -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
+    val s = LocalStrings.current
     
     // Animation states
     val scale = remember { Animatable(0f) }
@@ -177,7 +179,7 @@ fun VerificationResultScreen(
                 ) {
                     Icon(
                         imageVector = if (verified) Icons.Default.Check else Icons.Default.Close,
-                        contentDescription = if (verified) "Verified" else "Not Verified",
+                        contentDescription = if (verified) s.get("verified_title") else s.get("not_verified_title"),
                         modifier = Modifier.size(56.dp),
                         tint = if (verified) Color.White else bgColor
                     )
@@ -187,7 +189,7 @@ fun VerificationResultScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = if (verified) "Task Verified! ${rewardTier.emoji}" else "Not Verified",
+                text = if (verified) s.get("task_verified_format").format(rewardTier.emoji) else s.get("not_verified_title"),
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                 color = bgColor
             )
@@ -195,8 +197,8 @@ fun VerificationResultScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = if (verified) "Great work! Your apps are now unlocked."
-                else "The AI couldn't confirm your task was completed.",
+                text = if (verified) s.get("great_work_unlocked")
+                else s.get("ai_could_not_confirm"),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -221,7 +223,7 @@ fun VerificationResultScreen(
                         Text("🔓", fontSize = 20.sp)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "+$earnedMinutes MIN UNLOCKED",
+                            text = s.get("minutes_unlocked_format").format(earnedMinutes),
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
                             color = StreakGold
                         )
@@ -242,14 +244,14 @@ fun VerificationResultScreen(
                         Text("🤖", fontSize = 18.sp)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "AI Analysis",
+                            text = s.get("ai_analysis"),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = reason.ifBlank { if (verified) "Task completed successfully." else "Unable to verify." },
+                        text = reason.ifBlank { if (verified) s.get("task_completed_successfully") else s.get("unable_to_verify") },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -268,7 +270,7 @@ fun VerificationResultScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = bgColor),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Back to Home", style = MaterialTheme.typography.labelLarge, fontSize = 16.sp, color = Color.White)
+                    Text(s.get("back_to_home"), style = MaterialTheme.typography.labelLarge, fontSize = 16.sp, color = Color.White)
                 }
             } else {
                 Button(
@@ -281,7 +283,7 @@ fun VerificationResultScreen(
                 ) {
                     Icon(Icons.Default.Refresh, null, modifier = Modifier.size(20.dp), tint = Color.White)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Try Again", style = MaterialTheme.typography.labelLarge, fontSize = 16.sp, color = Color.White)
+                    Text(s.get("try_again"), style = MaterialTheme.typography.labelLarge, fontSize = 16.sp, color = Color.White)
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 OutlinedButton(
@@ -289,7 +291,7 @@ fun VerificationResultScreen(
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Back to Home")
+                    Text(s.get("back_to_home"))
                 }
             }
         }

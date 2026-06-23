@@ -79,7 +79,7 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun nextPage() {
-        _uiState.update { it.copy(currentPage = (it.currentPage + 1).coerceAtMost(4)) }
+        _uiState.update { it.copy(currentPage = (it.currentPage + 1).coerceAtMost(5)) }
     }
 
     fun previousPage() {
