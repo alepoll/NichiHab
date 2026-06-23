@@ -83,7 +83,7 @@ class NichiHabApplication : Application(), Configuration.Provider {
     private fun initializeRemoteConfig() {
         val remoteConfig = FirebaseRemoteConfig.getInstance()
         val configSettings = FirebaseRemoteConfigSettings.Builder()
-            .setMinimumFetchIntervalInSeconds(3600) // 1 hour for production, change to 0 for debugging
+            .setMinimumFetchIntervalInSeconds(0) // 0 for debugging, change to 3600 for production
             .build()
         remoteConfig.setConfigSettingsAsync(configSettings)
 
