@@ -32,7 +32,7 @@ import com.nichihab.app.util.LocalStrings
 fun PrivacyDisclosurePage() {
     val s = LocalStrings.current
     val context = LocalContext.current
-    val lang = s.get("__lang__") // will fallback to key if not set — we check below
+    val lang = s.get("__lang__")
     val isSpanish = lang == "es"
 
     Column(
@@ -132,7 +132,7 @@ fun PrivacyDisclosurePage() {
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
-                        text = if (isSpanish) "Leer Términos de Servicio completos" else "Read full Terms of Service",
+                        text = s.get("read_full_terms"),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         textDecoration = TextDecoration.Underline
@@ -158,7 +158,7 @@ fun PrivacyDisclosurePage() {
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
-                        text = if (isSpanish) "Leer Política de Privacidad completa" else "Read full Privacy Policy",
+                        text = s.get("read_full_privacy"),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         textDecoration = TextDecoration.Underline

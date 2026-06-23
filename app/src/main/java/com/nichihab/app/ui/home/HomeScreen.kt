@@ -1193,11 +1193,12 @@ private fun CountdownRingSection(
     val secs = secondsRemaining % 60
     val timeString = "%d:%02d:%02d".format(hours, minutes, secs)
     
-    val titleText = if (isTimerVisible) "Control de Enfoque Activo" else "Apps Bloqueadas"
+    val s = LocalStrings.current
+    val titleText = if (isTimerVisible) s.get("active_focus_control") else s.get("blocked_apps_title")
     val subtitleText = if (isTimerVisible) {
-        "$timeString ${LocalStrings.current.get("remaining")}"
+        "$timeString ${s.get("remaining")}"
     } else {
-        "Waiting for verification"
+        s.get("waiting_for_verification")
     }
 
     Card(
@@ -1410,7 +1411,7 @@ private fun TaskRow(task: Task, modifier: Modifier = Modifier, isEditable: Boole
             .then(if (isEditable) Modifier.combinedClickable(
                 onClick = {}, // No action on simple tap to avoid accidental opening
                 onLongClick = { onEdit() },
-                onLongClickLabel = "Edit task"
+                onLongClickLabel = s.get("edit_task")
             ) else Modifier),
         colors = CardDefaults.cardColors(
             containerColor = if (task.isCompleted) StatusVerified.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surfaceContainer
@@ -1476,6 +1477,7 @@ private fun AnimatedCompletableCheckmark(
     onComplete: () -> Unit
 ) {
     val context = LocalContext.current
+    val s = LocalStrings.current
     val vibrator = androidx.compose.runtime.remember { context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator }
     var isAnimating by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     
@@ -1556,7 +1558,7 @@ private fun AnimatedCompletableCheckmark(
             if (isCompleted || isAnimating) {
                 Icon(
                     Icons.Default.Check,
-                    contentDescription = "Done",
+                    contentDescription = s.get("done"),
                     tint = MaterialTheme.colorScheme.surface,
                     modifier = Modifier.size(16.dp)
                 )

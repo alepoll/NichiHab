@@ -115,17 +115,14 @@ fun SettingsScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showPrivacyDialog by remember { mutableStateOf(false) }
     if (showPrivacyDialog) {
-        val isEs = s.get("__lang__") == "es"
+        val isEs = state.language == "es" || (state.language == "auto" && java.util.Locale.getDefault().language == "es")
         val privacyUrl = if (isEs) com.nichihab.app.util.Constants.PRIVACY_URL_ES else com.nichihab.app.util.Constants.PRIVACY_URL
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { showPrivacyDialog = false },
-            title = { Text("Privacy Policy", style = MaterialTheme.typography.titleLarge) },
+            title = { Text(s.get("privacy_policy"), style = MaterialTheme.typography.titleLarge) },
             text = {
                 Text(
-                    text = "NichiHab strictly uses the Accessibility Service ONLY to detect if you open a distracting app during a focus session, so it can be blocked.\n\n" +
-                           "• We DO NOT record, store, or transmit your keystrokes, messages, screens, or web history.\n" +
-                           "• All app detection happens 100% locally on your device.\n\n" +
-                           "By using NichiHab, you consent to this local processing.",
+                    text = s.get("privacy_policy_body"),
                     style = MaterialTheme.typography.bodyMedium
                 )
             },
@@ -135,12 +132,12 @@ fun SettingsScreen(
                     val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(privacyUrl))
                     context.startActivity(intent)
                 }) {
-                    Text("Read Full Policy")
+                    Text(s.get("read_full_policy"))
                 }
             },
             dismissButton = {
                 androidx.compose.material3.TextButton(onClick = { showPrivacyDialog = false }) {
-                    Text("Close")
+                    Text(s.get("close"))
                 }
             }
         )
@@ -209,7 +206,7 @@ fun SettingsScreen(
                     androidx.compose.material3.TextButton(
                         onClick = { showPrivacyDialog = true }
                     ) {
-                        Text("Privacy Policy", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                        Text(s.get("privacy_policy"), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                     }
                 }
 
@@ -460,7 +457,7 @@ fun SettingsScreen(
                                         putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent)
                                         putExtra(
                                             DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                                            "Strict Mode requires Device Admin to prevent app uninstallation during focus sessions."
+                                            s.get("device_admin_explanation")
                                         )
                                     }
                                     adminLauncher.launch(intent)
@@ -487,7 +484,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // ── Privacy & Data ──
-            SectionHeader(title = "Privacy & Data", icon = Icons.Default.Shield)
+            SectionHeader(title = s.get("privacy_data"), icon = Icons.Default.Shield)
             Spacer(modifier = Modifier.height(12.dp))
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -495,8 +492,8 @@ fun SettingsScreen(
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Right to be Forgotten", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.error)
-                    Text("Permanently delete your account, session history, and all preferences. This action cannot be undone.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(s.get("right_to_be_forgotten"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.error)
+                    Text(s.get("delete_account_desc"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(modifier = Modifier.height(12.dp))
                     Button(
                         onClick = {
@@ -505,7 +502,7 @@ fun SettingsScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Delete Account & Data")
+                        Text(s.get("delete_account_btn"))
                     }
                 }
             }
@@ -520,8 +517,8 @@ fun SettingsScreen(
     if (showDeleteDialog) {
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Everything?", color = MaterialTheme.colorScheme.error) },
-            text = { Text("This will permanently delete your account, wipe all session history, and reset the app. The app will close immediately. Continue?") },
+            title = { Text(s.get("delete_everything_title"), color = MaterialTheme.colorScheme.error) },
+            text = { Text(s.get("delete_everything_body")) },
             confirmButton = {
                 androidx.compose.material3.TextButton(
                     onClick = {
@@ -529,12 +526,12 @@ fun SettingsScreen(
                         am.clearApplicationUserData()
                     }
                 ) {
-                    Text("Delete Forever", color = MaterialTheme.colorScheme.error)
+                    Text(s.get("delete_forever"), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 androidx.compose.material3.TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(s.get("cancel"))
                 }
             }
         )

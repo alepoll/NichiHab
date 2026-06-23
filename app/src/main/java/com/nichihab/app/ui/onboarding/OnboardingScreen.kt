@@ -209,7 +209,7 @@ fun OnboardingScreen(
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = s.get("back"),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

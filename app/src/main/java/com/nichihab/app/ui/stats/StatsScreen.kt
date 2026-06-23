@@ -176,8 +176,8 @@ fun StatsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                StatCard(Modifier.weight(1f), "Current Streak", "${state.currentStreak}", "🔥")
-                StatCard(Modifier.weight(1f), "Longest Streak", "${state.longestStreak}", "🏆")
+                StatCard(Modifier.weight(1f), s.get("current_streak"), "${state.currentStreak}", "🔥")
+                StatCard(Modifier.weight(1f), s.get("longest_streak"), "${state.longestStreak}", "🏆")
             }
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -189,12 +189,12 @@ fun StatsScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 StatCard(
-                    Modifier.weight(1f), "Completion Rate",
+                    Modifier.weight(1f), s.get("completion_rate"),
                     if (state.totalSessions > 0) "${(state.completionRate * 100).toInt()}%" else "—",
                     "📊"
                 )
                 StatCard(
-                    Modifier.weight(1f), "Time Saved",
+                    Modifier.weight(1f), s.get("time_saved"),
                     formatTimeSaved(state.estimatedTimeSavedMinutes),
                     "⏱️"
                 )
@@ -205,7 +205,7 @@ fun StatsScreen(
         // Heatmap
         item {
             Text(
-                text = "Last 30 Days",
+                text = s.get("last_30_days"),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -217,7 +217,7 @@ fun StatsScreen(
                 horizontalArrangement = Arrangement.End,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Less", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                Text(s.get("less"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
                 Spacer(modifier = Modifier.width(4.dp))
                 listOf(0, 1, 2, 3).forEach { level ->
                     Box(
@@ -229,7 +229,7 @@ fun StatsScreen(
                     Spacer(modifier = Modifier.width(2.dp))
                 }
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("More", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                Text(s.get("more"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
             }
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -242,7 +242,7 @@ fun StatsScreen(
 private fun HeatmapCalendar(heatmapData: Map<String, Int>) {
     val today = LocalDate.now()
     val days = (0..29).map { today.minusDays(29L - it) }
-
+    val s = LocalStrings.current
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
@@ -254,7 +254,10 @@ private fun HeatmapCalendar(heatmapData: Map<String, Int>) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                listOf("M", "T", "W", "T", "F", "S", "S").forEach {
+                listOf(
+                    s.get("day_mon_short"), s.get("day_tue_short"), s.get("day_wed_short"),
+                    s.get("day_thu_short"), s.get("day_fri_short"), s.get("day_sat_short"), s.get("day_sun_short")
+                ).forEach {
                     Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline, modifier = Modifier.width(32.dp), textAlign = TextAlign.Center)
                 }
             }

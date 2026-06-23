@@ -75,18 +75,20 @@ fun NichiHabNavGraph(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     contentColor = MaterialTheme.colorScheme.onSurface
                 ) {
+                    val s = com.nichihab.app.util.LocalStrings.current
                     Screen.bottomNavItems.forEach { screen ->
                         val selected = currentDestination?.hierarchy?.any {
                             it.route == screen.route
                         } == true
+                        val label = s.get("nav_${screen.route}")
                         NavigationBarItem(
                             icon = {
                                 Icon(
                                     imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
-                                    contentDescription = screen.title
+                                    contentDescription = label
                                 )
                             },
-                            label = { Text(screen.title) },
+                            label = { Text(label) },
                             selected = selected,
                             onClick = {
                                 navController.navigate(screen.route) {

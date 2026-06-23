@@ -91,6 +91,7 @@ fun CameraScreen(
     viewModel: VerificationViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val s = LocalStrings.current
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -228,7 +229,7 @@ fun CameraScreen(
         state.capturedBitmap?.let { bitmap ->
             Image(
                 bitmap = bitmap.asImageBitmap(),
-                contentDescription = "Captured Photo",
+                contentDescription = s.get("captured_photo"),
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
@@ -258,7 +259,7 @@ fun CameraScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onNavigateBack, modifier = Modifier.size(40.dp)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Color.White)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, s.get("back"), tint = Color.White)
             }
             Spacer(modifier = Modifier.width(8.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -291,7 +292,7 @@ fun CameraScreen(
             ) {
                 Icon(
                     Icons.Default.FlipCameraAndroid,
-                    contentDescription = "Switch Camera",
+                    contentDescription = s.get("switch_camera"),
                     tint = Color.White,
                     modifier = Modifier.size(22.dp)
                 )
