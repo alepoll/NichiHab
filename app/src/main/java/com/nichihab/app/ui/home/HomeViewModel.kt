@@ -96,7 +96,8 @@ class HomeViewModel @Inject constructor(
                 val logicalTodayStr = com.nichihab.app.util.TimeUtil.getLogicalDateDomain(latestSession)
                 tasks.filter { task ->
                     // Filter out expired today-only tasks (created on a past date)
-                    !(task.isTodayOnly && task.createdDate != null && task.createdDate != logicalTodayStr)
+                    // If createdDate is null, it's a new task for today
+                    task.isTodayOnly && (task.createdDate == null || task.createdDate == logicalTodayStr) || !task.isTodayOnly
                 }
             }
         } else {

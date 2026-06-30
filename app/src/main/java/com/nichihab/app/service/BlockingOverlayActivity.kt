@@ -320,44 +320,33 @@ private fun BlockingOverlayContent(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Verify button (only if API key is configured)
-        if (hasApiKey) {
-            Button(
-                onClick = {
-                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                        val intent = android.content.Intent(context, com.nichihab.app.MainActivity::class.java).apply {
-                            putExtra("navigate_to", "camera")
-                            flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or 
-                                    android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                                    android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        }
-                        context.startActivity(intent)
-                        (context as? android.app.Activity)?.finish()
-                    } else {
-                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        // Verify button
+        Button(
+            onClick = {
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    val intent = android.content.Intent(context, com.nichihab.app.MainActivity::class.java).apply {
+                        putExtra("navigate_to", "camera")
+                        flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or 
+                                android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Icon(Icons.Default.CameraAlt, null, modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.size(8.dp))
-                Text(s.get("verify_now"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-            }
-        } else {
-            // No API key configured
-            Text(
-                text = s.get("configure_api_key_warning"),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.error,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
+                    context.startActivity(intent)
+                    (context as? android.app.Activity)?.finish()
+                } else {
+                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Icon(Icons.Default.CameraAlt, null, modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(s.get("verify_now"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
 
         // Use Earned Time button (only if time is available)

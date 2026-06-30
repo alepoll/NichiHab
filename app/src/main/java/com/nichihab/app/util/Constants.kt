@@ -12,7 +12,7 @@ object Constants {
 
     // Gemini
     const val GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/"
-    const val GEMINI_MODEL = "gemini-2.0-flash"
+    const val GEMINI_MODEL = "gemini-flash-latest"
 
     // Verification
     const val MAX_VERIFICATION_ATTEMPTS = 5

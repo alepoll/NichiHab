@@ -3,7 +3,7 @@ package com.nichihab.app.ui.commercial
 object InputGuard {
     fun sanitizeTaskDescription(text: String): String {
         if (!CommercialSecurityConfig.ENABLE_INPUT_GUARD) return text
-        var sanitized = text.trim()
+        var sanitized = text
         if (sanitized.length > CommercialSecurityConfig.MAX_TASK_CHARS) {
             sanitized = sanitized.substring(0, CommercialSecurityConfig.MAX_TASK_CHARS)
         }

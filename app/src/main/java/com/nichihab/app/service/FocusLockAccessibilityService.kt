@@ -296,8 +296,8 @@ class NichiHabAccessibilityService : AccessibilityService() {
             return
         }
 
-        // Detect navigation to NichiHab-related screens within settings
-        if (packageName in hardModeBlockedPackages) {
+        // Detect navigation to NichiHab-related screens within settings (Hard Mode only)
+        if (packageName in hardModeBlockedPackages && cachedStrictnessMode == "hard") {
             val text = event.text?.joinToString(" ")?.lowercase() ?: ""
             val desc = event.contentDescription?.toString()?.lowercase() ?: ""
             if (text.contains("nichihab") || text.contains("focus lock") || desc.contains("nichihab") || desc.contains("focus lock")) {

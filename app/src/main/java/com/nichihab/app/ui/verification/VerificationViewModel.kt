@@ -190,13 +190,7 @@ class VerificationViewModel @Inject constructor(
             try {
                 _uiState.update { it.copy(isProcessing = true, error = null, result = null, isCapturing = false) }
 
-                val remoteConfig = com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance()
-                var apiKey = remoteConfig.getString("gemini_api_key")
-                
-                if (apiKey.isBlank()) {
-                    apiKey = com.nichihab.app.ui.commercial.CommercialSecurityConfig.GLOBAL_API_KEY
-                }
-                
+                val apiKey = com.nichihab.app.ui.commercial.CommercialSecurityConfig.GLOBAL_API_KEY
                 val provider = com.nichihab.app.ui.commercial.CommercialSecurityConfig.GLOBAL_PROVIDER
 
                 if (apiKey.isBlank()) {

@@ -354,10 +354,9 @@ fun CameraScreen(
                                     val buffer = image.planes[0].buffer
                                     val bytes = ByteArray(buffer.remaining())
                                     buffer.get(bytes)
-                                    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                                    val bitmap = com.nichihab.app.util.ImageUtil.byteArrayToBitmap(bytes)
                                     image.close()
                                     if (bitmap != null) {
-                                        cameraProvider?.unbindAll() // Stop live preview to freeze image
                                         viewModel.onPhotoCaptured(bitmap)
                                     } else {
                                         viewModel.resetForRetry()

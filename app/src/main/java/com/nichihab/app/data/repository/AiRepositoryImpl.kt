@@ -9,9 +9,7 @@ import com.nichihab.app.domain.repository.AiVerificationResult
 import com.nichihab.app.util.Constants
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.tasks.await
 import java.text.Normalizer
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,15 +31,7 @@ class AiRepositoryImpl @Inject constructor(
         taskDescription: String
     ): AiVerificationResult {
         return try {
-            val remoteConfig = FirebaseRemoteConfig.getInstance()
-            // Force fetch to ensure we have latest (optional, can rely on background fetch)
-            remoteConfig.fetchAndActivate().await() 
-            
-            var apiKey = remoteConfig.getString("gemini_api_key")
-            if (apiKey.isBlank()) {
-                // Fallback to local properties or NDK if config isn't loaded yet
-                apiKey = com.nichihab.app.ui.commercial.CommercialSecurityConfig.GLOBAL_API_KEY
-            }
+            val apiKey = com.nichihab.app.ui.commercial.CommercialSecurityConfig.GLOBAL_API_KEY
             
             if (apiKey.isBlank()) {
                 return AiVerificationResult(false, "API Key is missing. Please check your internet connection.", 0f, "")

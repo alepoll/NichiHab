@@ -737,7 +737,7 @@ private fun AddTaskDialog(
                 // Task description
                 OutlinedTextField(
                     value = title,
-                    onValueChange = { title = com.nichihab.app.ui.commercial.InputGuard.sanitizeTaskDescription(it) },
+                    onValueChange = { title = it },
                     label = { Text(s.get("task_description")) },
                     placeholder = { Text(s.get("task_placeholder")) },
                     modifier = Modifier.fillMaxWidth(),
@@ -1051,7 +1051,8 @@ private fun AddTaskDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    if (title.isNotBlank()) {
+                    val sanitizedTitle = com.nichihab.app.ui.commercial.InputGuard.sanitizeTaskDescription(title)
+                    if (sanitizedTitle.isNotBlank()) {
                         if (isOneTimeTask) {
                             val targetDate = if (scheduleForLater) {
                                 "%04d-%02d-%02d".format(selectedYear, selectedMonth, selectedDay)
@@ -1064,7 +1065,7 @@ private fun AddTaskDialog(
                                 java.time.LocalDate.now().dayOfWeek.value
                             }
                             onSchedule(
-                                title, emoji, targetDate, listOf(targetDow),
+                                sanitizedTitle, emoji, targetDate, listOf(targetDow),
                                 if (useCustomTime) startHour else null,
                                 if (useCustomTime) startMinute else null,
                                 if (useCustomTime) endHour else null,
@@ -1075,7 +1076,7 @@ private fun AddTaskDialog(
                             if (scheduleForLater) {
                                 val dateStr = "%04d-%02d-%02d".format(selectedYear, selectedMonth, selectedDay)
                                 onSchedule(
-                                    title, emoji, dateStr, selectedDays.sorted(),
+                                    sanitizedTitle, emoji, dateStr, selectedDays.sorted(),
                                     if (useCustomTime) startHour else null,
                                     if (useCustomTime) startMinute else null,
                                     if (useCustomTime) endHour else null,
@@ -1084,7 +1085,7 @@ private fun AddTaskDialog(
                                 )
                             } else if (selectedDays.isNotEmpty()) {
                                 onConfirm(
-                                    title, emoji, selectedDays.sorted(),
+                                    sanitizedTitle, emoji, selectedDays.sorted(),
                                     if (useCustomTime) startHour else null,
                                     if (useCustomTime) startMinute else null,
                                     if (useCustomTime) endHour else null,
@@ -1478,7 +1479,13 @@ private fun AnimatedCompletableCheckmark(
 ) {
     val context = LocalContext.current
     val s = LocalStrings.current
-    val vibrator = androidx.compose.runtime.remember { context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator }
+    val vibrator = androidx.compose.runtime.remember {
+        try {
+            context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator
+        } catch (e: Exception) {
+            null
+        }
+    }
     var isAnimating by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     
     val scale by androidx.compose.animation.core.animateFloatAsState(
@@ -1686,8 +1693,9 @@ private fun EditTaskDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    if (title.isNotBlank() && selectedDays.isNotEmpty()) {
-                        onConfirm(title, emoji, selectedDays.sorted(),
+                    val sanitizedTitle = com.nichihab.app.ui.commercial.InputGuard.sanitizeTaskDescription(title)
+                    if (sanitizedTitle.isNotBlank() && selectedDays.isNotEmpty()) {
+                        onConfirm(sanitizedTitle, emoji, selectedDays.sorted(),
                             if (useCustomTime) startHour else null, if (useCustomTime) startMinute else null,
                             if (useCustomTime) endHour else null, if (useCustomTime) endMinute else null)
                     }

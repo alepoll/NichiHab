@@ -9,7 +9,7 @@
     <!-- Logo with a specific size and center gravity -->
     <!-- 58dp is a safe size to ensure no cropping on any device launcher shape -->
     <item
-        android:drawable="@mipmap/ic_launcher"
+        android:drawable="@drawable/logo"
         android:gravity="center"
         android:width="58dp"
         android:height="58dp" />

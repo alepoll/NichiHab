@@ -113,8 +113,10 @@ class OnboardingViewModel @Inject constructor(
     fun saveEditedTask() {
         _uiState.update { state ->
             val index = state.editingTaskIndex ?: return@update state
+            val sanitized = com.nichihab.app.ui.commercial.InputGuard.sanitizeTaskDescription(state.customTaskText)
+            if (sanitized.isBlank()) return@update state
             val newTasks = state.tasks.toMutableList()
-            newTasks[index] = newTasks[index].copy(title = state.customTaskText, isCustom = true)
+            newTasks[index] = newTasks[index].copy(title = sanitized, isCustom = true)
             state.copy(tasks = newTasks, editingTaskIndex = null, customTaskText = "")
         }
     }
