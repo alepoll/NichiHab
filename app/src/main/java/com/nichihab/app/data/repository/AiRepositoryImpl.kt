@@ -1,17 +1,16 @@
 package com.nichihab.app.data.repository
 
-
+import android.util.Log
 import com.nichihab.app.data.remote.api.GeminiApiService
 import com.nichihab.app.data.remote.dto.*
 import com.nichihab.app.domain.model.AiTaskSuggestion
 import com.nichihab.app.domain.repository.AiRepository
 import com.nichihab.app.domain.repository.AiVerificationResult
+import com.nichihab.app.domain.repository.ApiKeyRepository
 import com.nichihab.app.util.Constants
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.tasks.await
 import java.text.Normalizer
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,7 +18,8 @@ import javax.inject.Singleton
 @Singleton
 class AiRepositoryImpl @Inject constructor(
     private val geminiApi: GeminiApiService,
-    private val moshi: Moshi
+    private val moshi: Moshi,
+    private val apiKeyRepository: ApiKeyRepository
 ) : AiRepository {
 
     // ── Local result cache for retry deduplication ──
@@ -33,21 +33,21 @@ class AiRepositoryImpl @Inject constructor(
         taskDescription: String
     ): AiVerificationResult {
         return try {
-            val remoteConfig = FirebaseRemoteConfig.getInstance()
-            // Force fetch to ensure we have latest (optional, can rely on background fetch)
-            remoteConfig.fetchAndActivate().await() 
-            
-            var apiKey = remoteConfig.getString("gemini_api_key")
-            if (apiKey.isBlank()) {
-                // Fallback to local properties or NDK if config isn't loaded yet
-                apiKey = com.nichihab.app.ui.commercial.CommercialSecurityConfig.GLOBAL_API_KEY
-            }
+            val apiKey = apiKeyRepository.getGeminiApiKey()
             
             if (apiKey.isBlank()) {
                 return AiVerificationResult(false, "API Key is missing. Please check your internet connection.", 0f, "")
             }
             
             verifyWithGemini(photoBase64, taskDescription, apiKey)
+        } catch (e: retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            Log.e("AiRepository", "HTTP ${e.code()}: ${errorBody ?: e.message}")
+            AiVerificationResult(
+                isVerified = false,
+                reason = "Error: ${e.message ?: "Unknown error"}",
+                rawResponse = errorBody ?: e.toString()
+            )
         } catch (e: Exception) {
             AiVerificationResult(
                 isVerified = false,

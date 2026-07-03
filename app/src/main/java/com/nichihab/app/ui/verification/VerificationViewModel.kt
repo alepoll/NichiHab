@@ -6,13 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.nichihab.app.data.local.datastore.SettingsDataStore
 import com.nichihab.app.data.repository.AiRepositoryImpl
 import com.nichihab.app.domain.model.Verification
+import com.nichihab.app.domain.repository.ApiKeyRepository
 import com.nichihab.app.domain.repository.AiVerificationResult
 import com.nichihab.app.domain.repository.SessionRepository
 import com.nichihab.app.domain.repository.TaskRepository
 import com.nichihab.app.domain.repository.VerificationRepository
+import com.nichihab.app.util.AiPromptGenerator
 import com.nichihab.app.util.Constants
 import com.nichihab.app.util.ImageUtil
-import com.nichihab.app.util.AiPromptGenerator
+import com.nichihab.app.util.PhotoHashCache
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,6 +45,7 @@ data class VerificationUiState(
     val isTooDark: Boolean = false,
     val isBlurry: Boolean = false,
     val isOffline: Boolean = false,
+    val isDuplicate: Boolean = false,
     val hasApiKey: Boolean = false,
     val apiProvider: String = Constants.PROVIDER_GEMINI,
     val strictnessMode: String = "normal",
@@ -58,7 +61,8 @@ class VerificationViewModel @Inject constructor(
     private val verificationRepository: VerificationRepository,
     private val taskRepository: TaskRepository,
     private val sessionRepository: SessionRepository,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val apiKeyRepository: ApiKeyRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(VerificationUiState())
@@ -190,13 +194,7 @@ class VerificationViewModel @Inject constructor(
             try {
                 _uiState.update { it.copy(isProcessing = true, error = null, result = null, isCapturing = false) }
 
-                val remoteConfig = com.google.firebase.remoteconfig.FirebaseRemoteConfig.getInstance()
-                var apiKey = remoteConfig.getString("gemini_api_key")
-                
-                if (apiKey.isBlank()) {
-                    apiKey = com.nichihab.app.ui.commercial.CommercialSecurityConfig.GLOBAL_API_KEY
-                }
-                
+                val apiKey = apiKeyRepository.getGeminiApiKey()
                 val provider = com.nichihab.app.ui.commercial.CommercialSecurityConfig.GLOBAL_PROVIDER
 
                 if (apiKey.isBlank()) {
@@ -207,11 +205,23 @@ class VerificationViewModel @Inject constructor(
                 }
 
                 try {
+                    // Duplicate photo detection (dHash)
+                    val photoHash = ImageUtil.computeDHash(bitmap)
+                    if (PhotoHashCache.isDuplicate(photoHash)) {
+                        _uiState.update {
+                            it.copy(isProcessing = false, isDuplicate = true)
+                        }
+                        return@launch
+                    }
+
                     // bitmapToBase64 internally resizes to MAX_IMAGE_EDGE_PX before encoding
                     val base64 = ImageUtil.bitmapToBase64(bitmap)
                     val taskDesc = _uiState.value.taskTitle
 
                     val result: AiVerificationResult = aiRepository.verifyWithGemini(base64, taskDesc, apiKey, _uiState.value.language)
+
+                    // Cache the photo hash after a successful submission
+                    PhotoHashCache.addHash(photoHash)
 
                     val newAttempts = _uiState.value.attempts + 1
 
@@ -330,6 +340,6 @@ class VerificationViewModel @Inject constructor(
     }
 
     fun resetForRetry() {
-        _uiState.update { it.copy(capturedBitmap = null, result = null, error = null, isCapturing = false, isBlurry = false) }
+        _uiState.update { it.copy(capturedBitmap = null, result = null, error = null, isCapturing = false, isBlurry = false, isDuplicate = false) }
     }
 }

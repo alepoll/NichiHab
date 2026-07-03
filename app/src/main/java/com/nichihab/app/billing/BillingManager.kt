@@ -16,8 +16,7 @@ import javax.inject.Singleton
 
 @Singleton
 class BillingManager @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val integrityGuard: IntegrityGuard
+    @ApplicationContext private val context: Context
 ) : PurchasesUpdatedListener {
 
     companion object {
@@ -80,15 +79,8 @@ class BillingManager @Inject constructor(
                     purchase.purchaseState == Purchase.PurchaseState.PURCHASED
                 }
                 
-                val isTrusted = integrityGuard.isEffectivelyTrusted()
-                val isPro = hasActiveSub && isTrusted
-                
-                if (hasActiveSub && !isTrusted) {
-                    Log.w(TAG, "Active subscription found, but device is UNTRUSTED. Blocking Pro features.")
-                }
-
-                _isProUser.value = isPro
-                com.nichihab.app.ui.commercial.CommercialTierManager.isProUser = isPro
+                _isProUser.value = hasActiveSub
+                com.nichihab.app.ui.commercial.CommercialTierManager.isProUser = hasActiveSub
                 
                 // Acknowledge purchases if needed
                 for (purchase in purchases) {
@@ -169,18 +161,8 @@ class BillingManager @Inject constructor(
                 purchase.purchaseState == Purchase.PurchaseState.PURCHASED
             }
             if (hasActiveSub) {
-                // Check integrity on new purchase
-                integrityGuard.forceRecheck()
-                
-                val isTrusted = integrityGuard.isEffectivelyTrusted()
-                val isPro = hasActiveSub && isTrusted
-
-                if (hasActiveSub && !isTrusted) {
-                    Log.w(TAG, "New purchase successful, but device is UNTRUSTED. Blocking Pro features.")
-                }
-
-                _isProUser.value = isPro
-                com.nichihab.app.ui.commercial.CommercialTierManager.isProUser = isPro
+                _isProUser.value = hasActiveSub
+                com.nichihab.app.ui.commercial.CommercialTierManager.isProUser = hasActiveSub
             }
             
             for (purchase in purchases) {

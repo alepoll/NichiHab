@@ -1,8 +1,10 @@
 package com.nichihab.app.di
 
+import com.nichihab.app.data.repository.ApiKeyRepositoryImpl
 import com.nichihab.app.data.repository.SessionRepositoryImpl
 import com.nichihab.app.data.repository.TaskRepositoryImpl
 import com.nichihab.app.data.repository.VerificationRepositoryImpl
+import com.nichihab.app.domain.repository.ApiKeyRepository
 import com.nichihab.app.domain.repository.SessionRepository
 import com.nichihab.app.domain.repository.TaskRepository
 import com.nichihab.app.domain.repository.VerificationRepository
@@ -27,4 +29,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindVerificationRepository(impl: VerificationRepositoryImpl): VerificationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindApiKeyRepository(impl: ApiKeyRepositoryImpl): ApiKeyRepository
 }

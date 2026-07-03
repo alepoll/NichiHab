@@ -4,12 +4,12 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.google.services)
 }
 
 android {
     namespace = "com.nichihab.app"
     compileSdk = 35
+    buildToolsVersion = "35.0.0"
 
     defaultConfig {
         applicationId = "com.nichihab.app"
@@ -24,6 +24,7 @@ android {
                 cppFlags += "-std=c++17"
             }
         }
+        buildConfigField("String", "GEMINI_API_KEY", "\"${env.fetchOrNull("GEMINI_API_KEY") ?: ""}\"")
     }
 
     buildTypes {
@@ -128,11 +129,4 @@ dependencies {
     // Camera Support (Fix for ListenableFuture)
     implementation("androidx.concurrent:concurrent-futures-ktx:1.1.0")
     implementation("com.google.guava:guava:31.1-android")
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.appcheck)
-    implementation(libs.firebase.config)
 }

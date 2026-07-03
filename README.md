@@ -18,7 +18,7 @@
 - **Asynchrony:** Kotlin Coroutines & Flow
 - **Database:** Room (Session and Task persistence)
 - **Storage:** Jetpack DataStore (Settings)
-- **Cloud:** Firebase (Auth, Firestore, Remote Config, Play Integrity)
+- **Cloud:** None (all local)
 - **AI:** Google Gemini 2.0 Flash
 - **Camera:** CameraX API
 
@@ -36,7 +36,7 @@
    ```
 2. Open the project in Android Studio.
 3. Sync Project with Gradle Files.
-4. Add your `google-services.json` to the `app/` folder.
+4. Configure your Gemini API Key in `app/src/main/cpp/security-lib.cpp`.
 5. (Optional) Configure your Gemini API Key in `app/src/main/cpp/security-lib.cpp`.
 
 ## 🛡️ Security Note

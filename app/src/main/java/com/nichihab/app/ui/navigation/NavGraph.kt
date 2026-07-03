@@ -76,7 +76,7 @@ fun NichiHabNavGraph(
                     contentColor = MaterialTheme.colorScheme.onSurface
                 ) {
                     val s = com.nichihab.app.util.LocalStrings.current
-                    Screen.bottomNavItems.forEach { screen ->
+                    Screen.bottomNavItems.filterNotNull().forEach { screen ->
                         val selected = currentDestination?.hierarchy?.any {
                             it.route == screen.route
                         } == true

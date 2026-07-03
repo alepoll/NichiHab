@@ -12,7 +12,7 @@ object Constants {
 
     // Gemini
     const val GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/"
-    const val GEMINI_MODEL = "gemini-2.0-flash"
+    const val GEMINI_MODEL = "gemini-3.5-flash"
 
     // Verification
     const val MAX_VERIFICATION_ATTEMPTS = 5
@@ -22,6 +22,11 @@ object Constants {
     // Blur detection threshold (Laplacian Variance)
     // Values below this indicate a blurry photo
     const val BLUR_THRESHOLD = 100.0
+
+    // Duplicate photo detection (dHash)
+    const val PHOTO_DUPLICATE_HAMMING_THRESHOLD = 10
+    const val PHOTO_HASH_CACHE_MAX_SIZE = 100
+    const val PHOTO_HASH_CACHE_EXPIRY_HOURS = 24
 
     // ── System Instructions (static prompt — sent once, reduces per-message cost) ──
     const val VERIFICATION_SYSTEM_INSTRUCTION =

@@ -119,4 +119,46 @@ object ImageUtil {
     fun byteArrayToBitmap(data: ByteArray): Bitmap? {
         return BitmapFactory.decodeByteArray(data, 0, data.size)
     }
+
+    /**
+     * Computes a 64-bit difference hash (dHash) for duplicate photo detection.
+     *
+     * Algorithm:
+     * 1. Downscale to 9×8 pixels and convert to grayscale
+     * 2. Compare adjacent pixels horizontally — if left > right, bit = 1
+     * 3. Returns a 64-bit Long hash
+     *
+     * Two photos with a Hamming distance below [Constants.PHOTO_DUPLICATE_HAMMING_THRESHOLD]
+     * are considered duplicates.
+     */
+    fun computeDHash(bitmap: Bitmap): Long {
+        val width = 9
+        val height = 8
+        val scaled = Bitmap.createScaledBitmap(bitmap, width, height, true)
+
+        val pixels = IntArray(width * height)
+        scaled.getPixels(pixels, 0, width, 0, 0, width, height)
+        scaled.recycle()
+
+        // Convert to grayscale
+        val gray = IntArray(width * height) { i ->
+            val p = pixels[i]
+            val r = (p shr 16) and 0xFF
+            val g = (p shr 8) and 0xFF
+            val b = p and 0xFF
+            (0.299 * r + 0.587 * g + 0.114 * b).toInt()
+        }
+
+        // Compute difference hash
+        var hash = 0L
+        for (y in 0 until height) {
+            for (x in 0 until width - 1) {
+                val idx = y * width + x
+                if (gray[idx] > gray[idx + 1]) {
+                    hash = hash or (1L shl (y * (width - 1) + x))
+                }
+            }
+        }
+        return hash
+    }
 }

@@ -6,6 +6,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.Settings
+import android.os.Handler
+import android.os.Looper
 import android.view.ViewGroup
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -146,7 +148,11 @@ fun CameraScreen(
         return
     }
 
-    val imageCapture = remember { ImageCapture.Builder().build() }
+    val imageCapture = remember {
+        ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+            .build()
+    }
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
 
     // Camera facing state: false = back camera, true = front camera
@@ -357,7 +363,9 @@ fun CameraScreen(
                                     val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                                     image.close()
                                     if (bitmap != null) {
-                                        cameraProvider?.unbindAll() // Stop live preview to freeze image
+                                        Handler(Looper.getMainLooper()).post {
+                                            cameraProvider?.unbindAll() // Stop live preview to freeze image
+                                        }
                                         viewModel.onPhotoCaptured(bitmap)
                                     } else {
                                         viewModel.resetForRetry()
@@ -439,6 +447,40 @@ fun CameraScreen(
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedButton(onClick = { viewModel.dismissBlurWarning() }) { Text(LocalStrings.current.get("retake")) }
                             Button(onClick = { viewModel.retryWithBlurryPhoto() }) { Text(LocalStrings.current.get("send_anyway")) }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Duplicate photo overlay
+        AnimatedVisibility(visible = state.isDuplicate, enter = fadeIn(), exit = fadeOut()) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.7f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                    shape = RoundedCornerShape(20.dp), modifier = Modifier.padding(32.dp)
+                ) {
+                    Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("\uD83D\uDD05", fontSize = 40.sp)
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            "Duplicate photo detected",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "This photo looks identical to a previous submission. Please take a fresh photo of your activity.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(onClick = { viewModel.resetForRetry() }) {
+                            Text("Take new photo")
                         }
                     }
                 }

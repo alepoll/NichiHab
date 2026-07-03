@@ -11,7 +11,6 @@ import com.nichihab.app.domain.model.SessionStatus
 import com.nichihab.app.domain.model.Task
 import com.nichihab.app.domain.repository.SessionRepository
 import com.nichihab.app.domain.repository.TaskRepository
-import com.nichihab.app.domain.repository.FirebaseUserRepository
 import com.nichihab.app.service.worker.NotificationScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -67,7 +66,6 @@ class HomeViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val settingsDataStore: SettingsDataStore,
     private val blockedAppDao: BlockedAppDao,
-    private val firebaseUserRepository: FirebaseUserRepository,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
@@ -343,15 +341,6 @@ class HomeViewModel @Inject constructor(
         endMinute: Int? = null
     ) {
         viewModelScope.launch {
-            // FIREBASE LIMIT CHECK
-            val isPro = com.nichihab.app.ui.commercial.CommercialTierManager.isProUser
-            val limit = com.nichihab.app.ui.commercial.CommercialTierManager.FREE_TIER_DAILY_TASK_LIMIT
-            val canAdd = firebaseUserRepository.canAddTask(isPro, limit)
-            if (!canAdd) {
-                Toast.makeText(appContext, "Daily task limit reached. Please upgrade to Pro.", Toast.LENGTH_LONG).show()
-                return@launch
-            }
-
             val latestSession = sessionRepository.getLatestSession()
             val logicalToday = com.nichihab.app.util.TimeUtil.getLogicalDateDomain(latestSession)
             var session = sessionRepository.getSessionForDate(logicalToday)
@@ -408,12 +397,8 @@ class HomeViewModel @Inject constructor(
             
             // Broadcast to update AccessibilityService if needed
             appContext.sendBroadcast(Intent(ACTION_SESSION_LOCKED).setPackage(appContext.packageName))
-
-            // Increment Firebase limit count
-            firebaseUserRepository.incrementTaskCount()
         }
     }
-
 
 
     /** Add a task scheduled for a specific future date */
@@ -429,15 +414,6 @@ class HomeViewModel @Inject constructor(
         isTodayOnly: Boolean = false
     ) {
         viewModelScope.launch {
-            // FIREBASE LIMIT CHECK
-            val isPro = com.nichihab.app.ui.commercial.CommercialTierManager.isProUser
-            val limit = com.nichihab.app.ui.commercial.CommercialTierManager.FREE_TIER_DAILY_TASK_LIMIT
-            val canAdd = firebaseUserRepository.canAddTask(isPro, limit)
-            if (!canAdd) {
-                Toast.makeText(appContext, "Daily task limit reached. Please upgrade to Pro.", Toast.LENGTH_LONG).show()
-                return@launch
-            }
-
             // Check if a session exists for the target date
             var session = sessionRepository.getSessionForDate(scheduledDate)
             if (session == null) {
@@ -497,9 +473,6 @@ class HomeViewModel @Inject constructor(
                 
                 // Broadcast to update AccessibilityService if needed
                 appContext.sendBroadcast(Intent(ACTION_SESSION_LOCKED).setPackage(appContext.packageName))
-
-                // Increment Firebase limit count
-                firebaseUserRepository.incrementTaskCount()
             }
         }
     }
