@@ -1,5 +1,18 @@
 # NichiHab 🌙⚖️
 
+<!--toc:start-->
+
+- [NichiHab 🌙⚖️](#nichihab-🌙️)
+  - [🚀 Key Features](#🚀-key-features)
+  - [🛠️ Tech Stack](#🛠️-tech-stack)
+  - [📦 Getting Started](#📦-getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+  - [🛡️ Security Note](#🛡️-security-note)
+  - [📄 License](#📄-license)
+
+<!--toc:end-->
+
 **NichiHab** is a high-strictness habit-building and focus application for Android. It uses AI verification and system-level blocking to ensure you stay committed to your goals before accessing distracting applications.
 
 ## 🚀 Key Features
@@ -25,22 +38,27 @@
 ## 📦 Getting Started
 
 ### Prerequisites
+
 - Android Studio Ladybug (2024.2.1) or newer
 - JDK 17
-- Android SDK 35 (Target) / 26 (Minimum)
 
 ### Installation
+
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/your-username/NichiHab.git
    ```
+
 2. Open the project in Android Studio.
 3. Sync Project with Gradle Files.
 4. Configure your Gemini API Key in `app/src/main/cpp/security-lib.cpp`.
 5. (Optional) Configure your Gemini API Key in `app/src/main/cpp/security-lib.cpp`.
 
 ## 🛡️ Security Note
+
 The application includes a native C++ layer (`security-lib.cpp`) to handle sensitive keys and integrity checks, providing a robust defense against common APK modification tools.
 
 ## 📄 License
+
 This project is licensed under the MIT License - see the LICENSE file for details.

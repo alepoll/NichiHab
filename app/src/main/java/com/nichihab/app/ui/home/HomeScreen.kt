@@ -151,6 +151,7 @@ fun HomeScreen(
     if (showAddTaskDialog) {
         AddTaskDialog(
             onDismiss = { showAddTaskDialog = false },
+            onShowPaywall = { showPaywall = true },
             onConfirm = { title, emoji, days, sH, sM, eH, eM ->
                 viewModel.addTask(title, emoji, days, sH, sM, eH, eM)
                 showAddTaskDialog = false
@@ -700,6 +701,7 @@ fun HomeScreen(
 @Composable
 private fun AddTaskDialog(
     onDismiss: () -> Unit,
+    onShowPaywall: () -> Unit = {},
     onConfirm: (String, String, List<Int>, Int?, Int?, Int?, Int?) -> Unit,
     onSchedule: (String, String, String, List<Int>, Int?, Int?, Int?, Int?, Boolean) -> Unit = { _, _, _, _, _, _, _, _, _ -> }
 ) {
@@ -929,6 +931,8 @@ private fun AddTaskDialog(
                         .clickable {
                             if (com.nichihab.app.ui.commercial.CommercialTierManager.canScheduleForLater()) {
                                 scheduleForLater = !scheduleForLater
+                            } else {
+                                onShowPaywall()
                             }
                         }
                         .padding(vertical = 4.dp),

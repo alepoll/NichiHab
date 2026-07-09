@@ -25,6 +25,7 @@ android {
             }
         }
         buildConfigField("String", "GEMINI_API_KEY", "\"${env.fetchOrNull("GEMINI_API_KEY") ?: ""}\"")
+        buildConfigField("String", "GEMINI_MODEL", "\"${env.fetchOrNull("GEMINI_MODEL") ?: "gemini-2.0-flash"}\"")
     }
 
     buildTypes {
@@ -125,6 +126,7 @@ dependencies {
     
     // Billing
     implementation(libs.billing)
+    implementation(libs.play.integrity)
 
     // Camera Support (Fix for ListenableFuture)
     implementation("androidx.concurrent:concurrent-futures-ktx:1.1.0")

@@ -1,11 +1,11 @@
 [versions]
 agp = "8.13.2"
-kotlin = "2.0.20"
-ksp = "2.0.20-1.0.25"
-hilt = "2.51.1"
+kotlin = "2.1.20"
+ksp = "2.1.20-1.0.32"
+hilt = "2.53.1"
 hiltNavigationCompose = "1.2.0"
 hiltWork = "1.2.0"
-room = "2.6.1"
+room = "2.7.0"
 coreKtx = "1.13.1"
 activityCompose = "1.9.2"
 composeBom = "2024.09.03"
@@ -20,6 +20,7 @@ okhttp = "4.12.0"
 moshi = "1.15.1"
 workmanager = "2.9.1"
 billing = "6.2.1"
+playIntegrity = "1.4.0"
 [libraries]
 # Core
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -82,6 +83,7 @@ workmanager = { group = "androidx.work", name = "work-runtime-ktx", version.ref 
 
 # Billing
 billing = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "billing" }
+play-integrity = { group = "com.google.android.play", name = "integrity", version.ref = "playIntegrity" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

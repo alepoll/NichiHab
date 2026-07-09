@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nichihab.app.ui.theme.StatusVerified
@@ -56,6 +58,7 @@ import java.util.Locale
 import com.nichihab.app.util.LocalStrings
 import com.nichihab.app.ui.onboarding.NeonBlue
 import com.nichihab.app.ui.onboarding.PulsingDot
+import com.nichihab.app.ui.commercial.CommercialTierManager
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -80,6 +83,10 @@ fun StatsScreen(
     var showUsageDialog by remember { mutableStateOf(false) }
     var usageStatsGranted by remember { mutableStateOf(hasUsageStatsPermission(context)) }
     var hasDismissedDialog by remember { mutableStateOf(false) }
+    var showPaywall by remember { mutableStateOf(false) }
+    if (showPaywall) {
+        com.nichihab.app.ui.commercial.PaywallScreen(onDismiss = { showPaywall = false })
+    }
 
     // Re-check on resume
     DisposableEffect(lifecycleOwner) {
@@ -204,11 +211,32 @@ fun StatsScreen(
 
         // Heatmap
         item {
-            Text(
-                text = s.get("last_30_days"),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = s.get("last_30_days"),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.weight(1f)
+                )
+                if (!com.nichihab.app.ui.commercial.CommercialTierManager.canViewFullHistory()) {
+                    Box(
+                        modifier = Modifier
+                            .clickable { showPaywall = true }
+                            .background(Color(0xFFFFA500).copy(alpha = 0.12f), RoundedCornerShape(6.dp))
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            "PRO",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFFFA500)
+                        )
+                    }
+                }
+            }
             Spacer(modifier = Modifier.height(12.dp))
             HeatmapCalendar(heatmapData = state.heatmapData)
             Spacer(modifier = Modifier.height(8.dp))

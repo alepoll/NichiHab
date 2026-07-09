@@ -53,30 +53,38 @@ fun NichiHabNavGraph(
     LaunchedEffect(initialNavigateTo, onboardingCompletedState) {
         if (initialNavigateTo == "camera" && onboardingCompletedState == true) {
             navController.navigate(Screen.Camera.route) {
-                // Ensure we don't build a massive stack
                 popUpTo(Screen.Home.route) {
                     saveState = true
                 }
                 launchSingleTop = true
                 restoreState = true
             }
+        } else if (initialNavigateTo == null && onboardingCompletedState == true) {
+            val currentRoute = navBackStackEntry?.destination?.route
+            if (currentRoute in listOf(Screen.Settings.route, Screen.Stats.route)) {
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Home.route) { inclusive = true }
+                    launchSingleTop = true
+                }
+            }
         }
     }
 
-    // Hide bottom bar on full-screen destinations
     val fullScreenRoutes = setOf(Screen.Onboarding.route, Screen.Camera.route, Screen.BlockedApps.route, "verification_result/{verified}/{reason}")
-    val showBottomBar = currentDestination?.route !in fullScreenRoutes
+    val currentRoute = currentDestination?.route
+    val showBottomBar = currentRoute == null || currentRoute !in fullScreenRoutes
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                     contentColor = MaterialTheme.colorScheme.onSurface
                 ) {
                     val s = com.nichihab.app.util.LocalStrings.current
-                    Screen.bottomNavItems.filterNotNull().forEach { screen ->
+                    val items = listOf(Screen.Home, Screen.Stats, Screen.Settings)
+                    items.forEach { screen ->
                         val selected = currentDestination?.hierarchy?.any {
                             it.route == screen.route
                         } == true

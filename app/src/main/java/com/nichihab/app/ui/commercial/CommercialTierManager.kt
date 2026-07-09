@@ -4,7 +4,7 @@ object CommercialTierManager {
     const val FREE_TIER_DAILY_TASK_LIMIT = 3
 
     // Actualizado por BillingManager cuando se detecta suscripción activa
-    var isProUser = false
+    var isProUser = true
 
     // Puente Comercial: Todas las funciones de gating centralizadas aquí.
     // Para desactivar cualquier restricción, solo cambia el return a true.
@@ -23,6 +23,10 @@ object CommercialTierManager {
 
     fun canScheduleForLater(): Boolean {
         return isProUser // Premium only
+    }
+
+    fun canViewFullHistory(): Boolean {
+        return isProUser
     }
 
     fun remainingTasks(currentTasksToday: Int): Int {

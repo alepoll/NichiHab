@@ -1,5 +1,7 @@
 package com.nichihab.app.util
 
+import com.nichihab.app.BuildConfig
+
 object Constants {
     // ── Official Website ──
     const val WEBSITE_URL = "https://nichihab.netlify.app"
@@ -12,7 +14,7 @@ object Constants {
 
     // Gemini
     const val GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/"
-    const val GEMINI_MODEL = "gemini-3.5-flash"
+    val GEMINI_MODEL: String get() = BuildConfig.GEMINI_MODEL
 
     // Verification
     const val MAX_VERIFICATION_ATTEMPTS = 5

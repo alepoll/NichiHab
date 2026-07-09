@@ -35,6 +35,7 @@ class SettingsDataStore @Inject constructor(
         private val KEY_REPEAT_DAILY = booleanPreferencesKey("repeat_daily")
         private val KEY_LANGUAGE = stringPreferencesKey("language")
         private val KEY_HAS_ACCEPTED_PRIVACY = booleanPreferencesKey("has_accepted_privacy")
+        private val KEY_IS_PRO_USER = booleanPreferencesKey("is_pro_user")
     }
 
     // ── Onboarding ──
@@ -122,6 +123,14 @@ class SettingsDataStore @Inject constructor(
 
     suspend fun setLanguage(lang: String) {
         context.dataStore.edit { it[KEY_LANGUAGE] = lang }
+    }
+
+    // ── Pro User Status ──
+    val isProUser: Flow<Boolean> = context.dataStore.data
+        .map { it[KEY_IS_PRO_USER] ?: false }
+
+    suspend fun setIsProUser(pro: Boolean) {
+        context.dataStore.edit { it[KEY_IS_PRO_USER] = pro }
     }
 
     /**
