@@ -283,20 +283,18 @@ class NichiHabAccessibilityService : AccessibilityService() {
             return
         }
 
-        // Detect navigation to NichiHab-related screens within settings
-        if (packageName in hardModeBlockedPackages) {
-            val text = event.text?.joinToString(" ")?.lowercase() ?: ""
-            val desc = event.contentDescription?.toString()?.lowercase() ?: ""
-            if (text.contains("nichihab") || text.contains("focus lock") || desc.contains("nichihab") || desc.contains("focus lock")) {
-                serviceScope.launch {
-                    val session = cachedSession
-                    if (session != null && isSessionActiveNow(session) && cachedIncompleteCount > 0) {
-                        lastOverlayLaunchTime = System.currentTimeMillis()
-                        showBlockingOverlay(session.id)
-                    }
+        // Hard Mode: block ALL system settings packages to prevent disabling
+        // accessibility / overlay permissions during an active session.
+        // Only activates when the user explicitly enabled hard mode.
+        if (cachedStrictnessMode == "hard" && packageName in hardModeBlockedPackages) {
+            serviceScope.launch {
+                val session = cachedSession
+                if (session != null && isSessionActiveNow(session) && cachedIncompleteCount > 0) {
+                    lastOverlayLaunchTime = System.currentTimeMillis()
+                    showBlockingOverlay(session.id)
                 }
-                return
             }
+            return
         }
         
         handleWindowChange(packageName, event, packageChanged)
