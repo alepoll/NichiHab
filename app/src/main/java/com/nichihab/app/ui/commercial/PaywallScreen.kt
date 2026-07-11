@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -55,6 +54,12 @@ fun PaywallScreen(
 
     var isYearly by remember { mutableStateOf(false) }
 
+    // Get real navigation bar height — navigationBarsPadding() may return 0 inside Dialog
+    val navBarDp = with(LocalContext.current) {
+        val resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
+        if (resourceId > 0) (resources.getDimensionPixelSize(resourceId) / resources.displayMetrics.density).dp else 0.dp
+    }
+
     Dialog(
         onDismissRequest = {
             viewModel.clearRestoreMessage()
@@ -77,8 +82,7 @@ fun PaywallScreen(
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(24.dp)
-                        .navigationBarsPadding()
+                        .padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 0.dp)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -203,6 +207,9 @@ fun PaywallScreen(
                     }) {
                         Text(s.get("maybe_later"), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
+
+                    // Extra bottom padding for system navigation bar height
+                    Spacer(modifier = Modifier.height(navBarDp))
                 }
             }
         }
