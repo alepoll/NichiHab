@@ -2,7 +2,18 @@ package com.nichihab.app.ui.commercial
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -51,13 +62,13 @@ fun PaywallScreen(
         },
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.95f))
-                .padding(24.dp),
-            contentAlignment = Alignment.Center
-        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.95f))
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -65,7 +76,10 @@ fun PaywallScreen(
                 elevation = CardDefaults.cardElevation(8.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp).verticalScroll(rememberScrollState()),
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .navigationBarsPadding()
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Box(
