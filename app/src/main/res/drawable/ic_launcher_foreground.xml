@@ -3,5 +3,5 @@
     android:inset="12%">
     <bitmap
         android:src="@drawable/logo"
-        android:gravity="fitCenter" />
+        android:gravity="fill" />
 </inset>
