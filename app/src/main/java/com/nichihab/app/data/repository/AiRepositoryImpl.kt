@@ -198,9 +198,10 @@ class AiRepositoryImpl @Inject constructor(
     // ── Cache helpers ──
 
     private fun buildCacheKey(taskDescription: String, photoBase64: String): String {
-        // Use first 64 chars of base64 as a fingerprint (enough to distinguish photos)
-        val imagePrefix = photoBase64.take(64)
-        return "$taskDescription|$imagePrefix"
+        // Use last 64 chars of base64 — JPEG headers are identical across photos,
+        // but the tail of the encoded data contains actual pixel content.
+        val imageSuffix = photoBase64.takeLast(64)
+        return "$taskDescription|$imageSuffix"
     }
 
     private fun getCachedResult(key: String): AiVerificationResult? {

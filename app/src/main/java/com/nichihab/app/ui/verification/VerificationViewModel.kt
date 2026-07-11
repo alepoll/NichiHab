@@ -220,8 +220,10 @@ class VerificationViewModel @Inject constructor(
 
                     val result: AiVerificationResult = aiRepository.verifyWithGemini(base64, taskDesc, apiKey, _uiState.value.language)
 
-                    // Cache the photo hash after a successful submission
-                    PhotoHashCache.addHash(photoHash)
+                    // Only cache photo hash on successful verification — not on failures
+                    if (result.isVerified) {
+                        PhotoHashCache.addHash(photoHash)
+                    }
 
                     val newAttempts = _uiState.value.attempts + 1
 
@@ -340,6 +342,11 @@ class VerificationViewModel @Inject constructor(
     }
 
     fun resetForRetry() {
-        _uiState.update { it.copy(capturedBitmap = null, result = null, error = null, isCapturing = false, isBlurry = false, isDuplicate = false) }
+        _uiState.update {
+            it.copy(
+                capturedBitmap = null, result = null, error = null,
+                isCapturing = false, isBlurry = false, isTooDark = false, isDuplicate = false
+            )
+        }
     }
 }

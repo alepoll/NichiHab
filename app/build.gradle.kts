@@ -28,12 +28,19 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("../nichihab-keystore.jks")
+            val pwMap = mutableMapOf<String, String>()
+            file("signing.properties").takeIf { it.exists() }?.forEachLine { line ->
+                val idx = line.indexOf('=')
+                if (idx > 0) pwMap[line.substring(0, idx).trim()] = line.substring(idx + 1).trim()
+            }
             storePassword = System.getenv("NICHIHAB_STORE_PASSWORD")
-                ?: error("NICHIHAB_STORE_PASSWORD env var is not set")
+                ?: pwMap["storePassword"]
+                ?: "" // fails at sign time, not config time
+            storeFile = file("../nichihab-keystore.jks")
             keyAlias = "nichihab"
             keyPassword = System.getenv("NICHIHAB_KEY_PASSWORD")
-                ?: error("NICHIHAB_KEY_PASSWORD env var is not set")
+                ?: pwMap["keyPassword"]
+                ?: ""
         }
     }
 
