@@ -52,8 +52,8 @@ App Android nativa (Kotlin/Jetpack Compose) de **bloqueo de apps con verificaci�
 
 ## .ENV (RAÍZ)
 ```
-GEMINI_API_KEY=***REMOVED***
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_API_KEY= (configurada vía JNI ofuscado en C++)
+GEMINI_MODEL= (configurado vía JNI ofuscado en C++)
 ```
 
 ---
@@ -146,7 +146,7 @@ onboarding_completed, api_provider, api_key_encrypted, theme_mode, strictness_mo
 ## API - GEMINI (único endpoint)
 - **URL**: `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`
 - **Auth**: Header `x-goog-api-key`
-- **Modelo**: `gemini-2.5-flash`
+- **Modelo**: `gemini-3.1-flash-lite` (ofuscado en C++ via JNI)
 - **System Prompt endurecido** (anti-jailbreak, multilingüe)
 - **Parseo**: VERIFIED/VERIFICADO/VERIFIE/VERIFIZIERT o NOT_VERIFIED/NO_VERIFICADO/NON_VERIFIE/NICHT_VERIFIZIERT
 
@@ -207,18 +207,21 @@ SKUs: `NichiHab_pro_monthly`, `NichiHab_pro_yearly`
 ### CommercialTierManager
 - `canAddTask()`, `canUseHardMode()`, `canUseWeeklyCalendar()`, `canScheduleForLater()`, `canViewFullHistory()`
 - Límite Free: 3 tareas/día. Pro: ilimitado
+- `isProUser` default `false` (inicia como free hasta que BillingManager confirme lo contrario)
 - `isProUser` persistido en DataStore (restaurado al iniciar)
 
 ### Gating implementado en:
-- **HomeScreen**: Add Task, Weekly Calendar, Schedule for Later → paywall (vía callback `onShowPaywall`)
+- **HomeScreen**: Add Task, Weekly Calendar, Schedule for Later → paywall
+  - Contador de tareas: Free `X/3`, Pro `X ∞`
 - **SettingsScreen**: Hard Mode toggle → paywall
-- **StatsScreen**: Heatmap con badge PRO clickeable → paywall (canViewFullHistory)
+- **StatsScreen**: Heatmap completo solo visible para Pro. Free users ven banner "Get Pro"
 - **AppStrings**: Paywall keys en 5 idiomas (en, es, fr, pt, de) con ~20 nuevas keys
 
 ---
 
 ## SEGURIDAD
-- API Key ofuscada en C++ (XOR via JNI) + fallback BuildConfig
+- API Key ofuscada en C++ (XOR via JNI) — sin fallback a BuildConfig
+- Modelo Gemini (`gemini-3.1-flash-lite`) también ofuscado en C++ via JNI
 - API Key usuario cifrada AES-256 GCM (Android KeyStore)
 - DeviceAdmin anti-desinstalación
 - AccessibilityService bloquea Settings
@@ -231,7 +234,7 @@ SKUs: `NichiHab_pro_monthly`, `NichiHab_pro_yearly`
 ---
 
 ## MULTILINGÜE
-AppStrings propio: en, es, fr, pt, de (~1170 líneas)
+AppStrings propio: en, es, fr, pt, de (~1190 líneas)
 Prompts AI contextualizados por tipo de tarea + localizados
 
 ---
@@ -251,3 +254,19 @@ Canales: NichiHab_reminders, NichiHab_session, NichiHab_achievements
 - **Migración DB destructiva** - versión 6, no hay migraciones progresivas
 - **Kotlin actualizado a 2.1.20** y librerías compatibles (Hilt 2.53.1, Room 2.7.0, KSP 2.1.20-1.0.32)
 - **Gradle wrapper 8.13** generado para compatibilidad con JDK 25
+
+---
+
+## PLAY STORE — CHECKLIST PRE-LANZAMIENTO
+
+| Ítem | Estado | Notas |
+|---|---|---|
+| SKUs creadas en Google Play Console | ⚠️ Pendiente | `NichiHab_pro_monthly`, `NichiHab_pro_yearly` |
+| `CLOUD_PROJECT_NUMBER` configurado | ⚠️ Pendiente | IntegrityGuard.kt:27 — poner número real de GCP |
+| API Key Gemini ofuscada en C++ vía JNI | ✅ Listo | Ver `security-lib.cpp` (XOR 0x5A) |
+| Modelo Gemini ofuscado en C++ vía JNI | ✅ Listo | `gemini-3.1-flash-lite` |
+| `isProUser` default `false` (sin fugas) | ✅ Listo | CommercialTierManager.kt |
+| Gating heatmap StatsScreen | ✅ Listo | Solo Pro ve heatmap completo |
+| Contador tareas Free vs Pro | ✅ Listo | `X/3` vs `X ∞` |
+| Restore mensaje se limpia al cerrar | ✅ Listo | PaywallScreen |
+| Bottom nav 3 botones siempre visibles | ✅ Listo | Fixes en NavGraph

@@ -20,4 +20,6 @@ local.properties
 Thumbs.db
 
 # Secrets
-# google-services.json
+signing.properties
+*.jks
+google-services.json

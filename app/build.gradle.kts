@@ -24,12 +24,22 @@ android {
                 cppFlags += "-std=c++17"
             }
         }
-        buildConfigField("String", "GEMINI_API_KEY", "\"${env.fetchOrNull("GEMINI_API_KEY") ?: ""}\"")
-        buildConfigField("String", "GEMINI_MODEL", "\"${env.fetchOrNull("GEMINI_MODEL") ?: "gemini-2.0-flash"}\"")
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("../nichihab-keystore.jks")
+            storePassword = System.getenv("NICHIHAB_STORE_PASSWORD")
+                ?: error("NICHIHAB_STORE_PASSWORD env var is not set")
+            keyAlias = "nichihab"
+            keyPassword = System.getenv("NICHIHAB_KEY_PASSWORD")
+                ?: error("NICHIHAB_KEY_PASSWORD env var is not set")
+        }
     }
 
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -46,6 +56,10 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+    }
+
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
 
     buildFeatures {
