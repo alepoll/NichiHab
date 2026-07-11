@@ -62,7 +62,7 @@ class AppStrings(private val lang: String = "en") {
                 "strictness_title" to "Strictness",
                 "hard_mode" to "Hard mode 🔒",
                 "hard_mode_active" to "Hard mode 🔒 (Active)",
-                "hard_mode_sub" to "Blocks 'Phone settings' to prevent you from disabling NichiHab.",
+                "hard_mode_sub" to "Blocks phone settings during focus sessions to prevent disabling NichiHab.",
                 "hard_mode_locked_banner" to "🔒 Hard mode active — Settings locked during session",
                 "about_version" to "NichiHab v1.0.0",
                 // ── Home ──
@@ -359,9 +359,6 @@ class AppStrings(private val lang: String = "en") {
                 "ok" to "OK",
                 "am" to "AM",
                 "pm" to "PM",
-                // ── Device Admin ──
-                "device_admin_disable_warning" to "Disabling this will allow you to uninstall NichiHab and bypass your blocks.",
-                "device_admin_explanation" to "Strict Mode requires Device Admin to prevent app uninstallation during focus sessions.",
                 // ── Time Window ──
                 "time_adjust_hint" to "Tap the times above, then use the +/- buttons to adjust",
                 "start_minus_1h" to "Start -1h",
@@ -429,7 +426,7 @@ class AppStrings(private val lang: String = "en") {
                 "strictness_title" to "Nivel de rigor",
                 "hard_mode" to "Modo estricto 🔒",
                 "hard_mode_active" to "Modo estricto 🔒 (Activo)",
-                "hard_mode_sub" to "Bloquea los 'Ajustes del teléfono' para evitar que desactives NichiHab.",
+                "hard_mode_sub" to "Bloquea la configuración del teléfono durante las sesiones para evitar que desactives NichiHab.",
                 "hard_mode_locked_banner" to "🔒 Modo estricto activo — Configuración bloqueada durante la sesión",
                 "about_version" to "NichiHab v1.0.0",
                 "greeting_morning" to "Buenos días",
@@ -709,9 +706,6 @@ class AppStrings(private val lang: String = "en") {
                 "ok" to "OK",
                 "am" to "AM",
                 "pm" to "PM",
-                // ── Device Admin ──
-                "device_admin_disable_warning" to "Desactivar esto permitirá desinstalar NichiHab y evitar los bloqueos.",
-                "device_admin_explanation" to "El Modo Estricto requiere Admin de Dispositivo para evitar la desinstalación durante sesiones de enfoque.",
                 // ── Time Window ──
                 "time_adjust_hint" to "Toca las horas de arriba, luego usa los botones +/- para ajustar",
                 "start_minus_1h" to "Inicio -1h",
@@ -784,7 +778,7 @@ class AppStrings(private val lang: String = "en") {
                 "status_free" to "TEMPS LIBRE — Aucune session active",
                 "hard_mode" to "Mode strict 🔒",
                 "hard_mode_active" to "Mode strict 🔒 (Actif)",
-                "hard_mode_sub" to "Impossible de contourner les sessions actives",
+                "hard_mode_sub" to "Bloque les paramètres du téléphone pendant les sessions de concentration.",
                 "hard_mode_locked_banner" to "🔒 Mode strict actif — Paramètres verrouillés",
                 // ── Blur Detection ──
                 "too_blurry" to "Photo floue",
@@ -941,7 +935,7 @@ class AppStrings(private val lang: String = "en") {
                 "status_free" to "TEMPO LIVRE — Sem sessão ativa",
                 "hard_mode" to "Modo rígido 🔒",
                 "hard_mode_active" to "Modo rígido 🔒 (Ativo)",
-                "hard_mode_sub" to "Não é possível ignorar sessões ativas",
+                "hard_mode_sub" to "Bloqueia as configurações do telefone durante as sessões de foco.",
                 "hard_mode_locked_banner" to "🔒 Modo rígido ativo — Configurações bloqueadas",
                 // ── Blur Detection ──
                 "too_blurry" to "Foto desfocada",
@@ -1098,7 +1092,7 @@ class AppStrings(private val lang: String = "en") {
                 "status_free" to "FREIZEIT — Keine aktive Sitzung",
                 "hard_mode" to "Strenger Modus 🔒",
                 "hard_mode_active" to "Strenger Modus 🔒 (Aktiv)",
-                "hard_mode_sub" to "Aktive Sitzungen können nicht umgangen werden",
+                "hard_mode_sub" to "Blockiert Telefoneinstellungen während Fokus-Sitzungen.",
                 "hard_mode_locked_banner" to "🔒 Strenger Modus aktiv — Einstellungen gesperrt",
                 // ── Blur Detection ──
                 "too_blurry" to "Foto unscharf",

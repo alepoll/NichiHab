@@ -38,8 +38,28 @@ class PaywallViewModel @Inject constructor(
         viewModelScope.launch {
             _isRestoring.value = true
             _restoreMessage.value = null
+
+            // Trigger a fresh check
             billingManager.checkProStatus()
-            kotlinx.coroutines.delay(1000)
+
+            // Wait for the StateFlow to update (with timeout)
+            val timeoutMs = 8000L
+            val startTime = System.currentTimeMillis()
+            var lastValue = billingManager.isProUser.value
+
+            while (System.currentTimeMillis() - startTime < timeoutMs) {
+                val currentValue = billingManager.isProUser.value
+                if (currentValue != lastValue) {
+                    // Value changed — checkProStatus callback completed
+                    break
+                }
+                lastValue = currentValue
+                kotlinx.coroutines.delay(100)
+            }
+
+            // Give one more moment for persistence
+            kotlinx.coroutines.delay(200)
+
             val isPro = billingManager.isProUser.value
             _isRestoring.value = false
             _restoreMessage.value = if (isPro) "restore_success" else "restore_not_found"

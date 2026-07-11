@@ -1,12 +1,7 @@
 package com.nichihab.app.ui.settings
 
 import android.Manifest
-import android.app.admin.DevicePolicyManager
-import android.content.ComponentName
-import android.content.Intent
 import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
@@ -76,7 +71,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nichihab.app.util.AppStrings
 import com.nichihab.app.util.Constants
 import com.nichihab.app.util.LocalStrings
-import com.nichihab.app.service.NichiHabDeviceAdmin
 import androidx.compose.ui.platform.LocalContext
 
 @OptIn(com.google.accompanist.permissions.ExperimentalPermissionsApi::class)
@@ -90,17 +84,6 @@ fun SettingsScreen(
     val context = LocalContext.current
     val isHardLocked = state.isSessionActive && state.strictnessMode == "hard" && !state.allTasksComplete
     val contentAlpha = if (isHardLocked) 0.45f else 1f
-
-    // Device Admin state
-    val dpm = remember { context.getSystemService(android.content.Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager }
-    val adminComponent = remember { ComponentName(context, NichiHabDeviceAdmin::class.java) }
-    var isDeviceAdminActive by remember { mutableStateOf(dpm.isAdminActive(adminComponent)) }
-
-    val adminLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) {
-        isDeviceAdminActive = dpm.isAdminActive(adminComponent)
-    }
 
     // Collapsible section states (collapsed by default)
     var permissionsExpanded by remember { mutableStateOf(false) }
@@ -450,28 +433,7 @@ fun SettingsScreen(
                                 showPaywall = true
                                 return@Switch
                             }
-                            if (enabled) {
-                                // Auto-activate Device Admin when enabling Strict Mode
-                                if (!isDeviceAdminActive) {
-                                    val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-                                        putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent)
-                                        putExtra(
-                                            DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                                            s.get("device_admin_explanation")
-                                        )
-                                    }
-                                    adminLauncher.launch(intent)
-                                }
-                                viewModel.onStrictnessModeChanged("hard")
-                                isDeviceAdminActive = dpm.isAdminActive(adminComponent)
-                            } else {
-                                // Deactivate Device Admin when disabling Hard Mode
-                                if (isDeviceAdminActive) {
-                                    dpm.removeActiveAdmin(adminComponent)
-                                    isDeviceAdminActive = false
-                                }
-                                viewModel.onStrictnessModeChanged("normal")
-                            }
+                            viewModel.onStrictnessModeChanged(if (enabled) "hard" else "normal")
                         },
                         enabled = !(isHardLocked && state.strictnessMode == "hard"),
                         colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.error, checkedThumbColor = MaterialTheme.colorScheme.onError)

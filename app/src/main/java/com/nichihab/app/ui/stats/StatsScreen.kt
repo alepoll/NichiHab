@@ -238,26 +238,52 @@ fun StatsScreen(
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
-            HeatmapCalendar(heatmapData = state.heatmapData)
-            Spacer(modifier = Modifier.height(8.dp))
-            // Legend
-            Row(
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(s.get("less"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
-                Spacer(modifier = Modifier.width(4.dp))
-                listOf(0, 1, 2, 3).forEach { level ->
-                    Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                            .background(heatmapColor(level))
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
+            if (com.nichihab.app.ui.commercial.CommercialTierManager.canViewFullHistory()) {
+                HeatmapCalendar(heatmapData = state.heatmapData)
+                Spacer(modifier = Modifier.height(8.dp))
+                // Legend
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(s.get("less"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    listOf(0, 1, 2, 3).forEach { level ->
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(heatmapColor(level))
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(s.get("more"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
                 }
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(s.get("more"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showPaywall = true }
+                        .background(Color(0xFFFFA500).copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            s.get("nichihab_pro"),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFFFA500)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            s.get("unlock_potential"),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(24.dp))
         }

@@ -1,6 +1,7 @@
 package com.nichihab.app.util
 
-import com.nichihab.app.BuildConfig
+import android.content.Context
+import android.provider.Settings
 
 object Constants {
     // ── Official Website ──
@@ -14,7 +15,7 @@ object Constants {
 
     // Gemini
     const val GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/"
-    val GEMINI_MODEL: String get() = BuildConfig.GEMINI_MODEL
+    val GEMINI_MODEL: String get() = com.nichihab.app.ui.commercial.CommercialSecurityConfig.GLOBAL_MODEL
 
     // Verification
     const val MAX_VERIFICATION_ATTEMPTS = 5
@@ -87,5 +88,19 @@ object Constants {
         return if (language == "en") base
         else "$base Write task descriptions and photoHints in $langName."
     }
-}
 
+    fun getObfuscatedAccountId(context: Context): String {
+        // Use Android ID as a stable device-specific identifier
+        // In a production app with user accounts, use a hash of the user's email/ID
+        val androidId = Settings.Secure.getString(
+            context.contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
+        return androidId?.let {
+            // Hash it — don't expose raw Android ID
+            java.security.MessageDigest.getInstance("SHA-256")
+                .digest(it.toByteArray())
+                .joinToString("") { "%02x".format(it) }
+        } ?: "unknown-device"
+    }
+}

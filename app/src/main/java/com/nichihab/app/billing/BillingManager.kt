@@ -52,19 +52,7 @@ class BillingManager @Inject constructor(
         .build()
 
     init {
-        restorePersistedProStatus()
         connectToBilling(0)
-    }
-
-    private fun restorePersistedProStatus() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val persisted = settingsDataStore.isProUser.first()
-            if (persisted) {
-                _isProUser.value = true
-                CommercialTierManager.isProUser = true
-                Log.d(TAG, "Pro status restored from DataStore")
-            }
-        }
     }
 
     private fun connectToBilling(retryCount: Int = 0) {
@@ -158,17 +146,34 @@ class BillingManager @Inject constructor(
                 }
 
                 _isProUser.value = hasActiveSub
-                CommercialTierManager.isProUser = hasActiveSub
-
+                CommercialTierManager.updateProStatus(hasActiveSub)
                 persistProStatus(hasActiveSub)
 
+                // Acknowledge any unacknowledged purchases (except PENDING ones)
                 for (purchase in purchases) {
-                    if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged) {
-                        acknowledgePurchase(purchase)
+                    when (purchase.purchaseState) {
+                        Purchase.PurchaseState.PURCHASED -> {
+                            if (!purchase.isAcknowledged) {
+                                acknowledgePurchase(purchase)
+                            }
+                        }
+                        Purchase.PurchaseState.PENDING -> {
+                            Log.d(TAG, "Purchase pending for ${purchase.products}. Waiting for completion.")
+                            // Don't acknowledge pending purchases — Google Play will retry
+                        }
+                        Purchase.PurchaseState.UNSPECIFIED_STATE -> {
+                            Log.w(TAG, "Purchase in unspecified state for ${purchase.products}")
+                        }
                     }
                 }
             } else {
                 Log.e(TAG, "Failed to query purchases: ${billingResult.debugMessage}")
+                // Fall back to persisted value
+                CoroutineScope(Dispatchers.IO).launch {
+                    val persisted = settingsDataStore.isProUser.first()
+                    _isProUser.value = persisted
+                    CommercialTierManager.updateProStatus(persisted)
+                }
             }
         }
     }
@@ -181,19 +186,34 @@ class BillingManager @Inject constructor(
 
     private fun acknowledgePurchase(purchase: Purchase) {
         CoroutineScope(Dispatchers.IO).launch {
-            val integrityResult = IntegrityGuard.verifyPurchaseToken(context, purchase.purchaseToken)
-            if (!integrityResult.isIntegrityVerified) {
-                Log.w(TAG, "Integrity check warning for purchase ${purchase.products}: ${integrityResult.errorMessage}")
-            }
-        }
+            try {
+                val integrityResult = IntegrityGuard.verifyPurchaseToken(context, purchase.purchaseToken)
+                if (integrityResult.isIntegrityVerified) {
+                    // Integrity passed — proceed with acknowledgment
+                    val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+                        .setPurchaseToken(purchase.purchaseToken)
+                        .build()
 
-        val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
-            .setPurchaseToken(purchase.purchaseToken)
-            .build()
-
-        billingClient.acknowledgePurchase(acknowledgePurchaseParams) { billingResult ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                Log.d(TAG, "Purchase acknowledged successfully")
+                    billingClient.acknowledgePurchase(acknowledgePurchaseParams) { billingResult ->
+                        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                            Log.d(TAG, "Purchase acknowledged successfully with integrity verification")
+                        }
+                    }
+                } else {
+                    Log.e(TAG, "INTEGRITY FAILED for purchase ${purchase.products}. Not acknowledging.")
+                    // Revoke Pro access if integrity fails
+                    _isProUser.value = false
+                    CommercialTierManager.updateProStatus(false)
+                    persistProStatus(false)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Integrity check failed for purchase: ${e.message}")
+                // On error, still acknowledge to avoid stuck purchases
+                // but don't grant Pro
+                val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+                    .setPurchaseToken(purchase.purchaseToken)
+                    .build()
+                billingClient.acknowledgePurchase(acknowledgePurchaseParams) { _ -> }
             }
         }
     }
@@ -201,6 +221,8 @@ class BillingManager @Inject constructor(
     fun launchPurchaseFlow(activity: Activity, productId: String) {
         if (!billingClient.isReady) {
             Log.e(TAG, "Billing client not ready to purchase")
+            Toast.makeText(activity, "Conectando con Google Play...", Toast.LENGTH_SHORT).show()
+            connectToBilling(0)
             return
         }
 
@@ -229,6 +251,7 @@ class BillingManager @Inject constructor(
 
                 val billingFlowParams = BillingFlowParams.newBuilder()
                     .setProductDetailsParamsList(productDetailsParamsList)
+                    .setObfuscatedAccountId(com.nichihab.app.util.Constants.getObfuscatedAccountId(context))
                     .build()
 
                 billingClient.launchBillingFlow(activity, billingFlowParams)
@@ -250,13 +273,23 @@ class BillingManager @Inject constructor(
             }
             if (hasActiveSub) {
                 _isProUser.value = true
-                CommercialTierManager.isProUser = true
+                CommercialTierManager.updateProStatus(true)
                 persistProStatus(true)
             }
 
             for (purchase in purchases) {
-                if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged) {
-                    acknowledgePurchase(purchase)
+                when (purchase.purchaseState) {
+                    Purchase.PurchaseState.PURCHASED -> {
+                        if (!purchase.isAcknowledged) {
+                            acknowledgePurchase(purchase)
+                        }
+                    }
+                    Purchase.PurchaseState.PENDING -> {
+                        Log.d(TAG, "Purchase pending for ${purchase.products}. Waiting for completion.")
+                    }
+                    Purchase.PurchaseState.UNSPECIFIED_STATE -> {
+                        Log.w(TAG, "Purchase in unspecified state for ${purchase.products}")
+                    }
                 }
             }
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {

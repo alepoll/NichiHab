@@ -45,7 +45,10 @@ fun PaywallScreen(
     var isYearly by remember { mutableStateOf(false) }
 
     Dialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            viewModel.clearRestoreMessage()
+            onDismiss()
+        },
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Box(
@@ -101,7 +104,7 @@ fun PaywallScreen(
 
                     FeatureRow(Icons.Default.AllInclusive, s.get("unlimited_tasks"), s.get("ai_verify_unlimited"))
                     Spacer(modifier = Modifier.height(16.dp))
-                    FeatureRow(Icons.Default.Shield, s.get("hard_mode_feature"), s.get("anti_uninstall_strict"))
+                    FeatureRow(Icons.Default.Shield, s.get("hard_mode_feature"), s.get("hard_mode_sub"))
                     Spacer(modifier = Modifier.height(16.dp))
                     FeatureRow(Icons.Default.CalendarMonth, s.get("weekly_calendar_feature"), s.get("plan_success"))
 
@@ -180,7 +183,10 @@ fun PaywallScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    TextButton(onClick = onDismiss) {
+                    TextButton(onClick = {
+                        viewModel.clearRestoreMessage()
+                        onDismiss()
+                    }) {
                         Text(s.get("maybe_later"), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }

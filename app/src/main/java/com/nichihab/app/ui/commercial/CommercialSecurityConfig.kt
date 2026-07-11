@@ -11,10 +11,13 @@ object CommercialSecurityConfig {
 
     // Llama a la función JNI en C++ para ensamblar la llave
     private external fun getNativeApiKey(): String
+    private external fun getNativeModel(): String
 
     // 1. Central API Key Config (Ahora segura y ofuscada)
     val GLOBAL_API_KEY: String
         get() = getNativeApiKey()
+    val GLOBAL_MODEL: String
+        get() = getNativeModel()
         
     const val GLOBAL_PROVIDER = Constants.PROVIDER_GEMINI
 

@@ -13,6 +13,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -476,21 +477,34 @@ fun HomeScreen(
                     )
                     // Puente Comercial: Contador de tareas
                 val currentCount = state.tasks.size
-                val limit = com.nichihab.app.ui.commercial.CommercialTierManager.FREE_TIER_DAILY_TASK_LIMIT
+                val isPro = com.nichihab.app.ui.commercial.CommercialTierManager.isProUser
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "$currentCount/$limit",
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = if (currentCount >= limit) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .background(
-                            if (currentCount >= limit) MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
-                            else MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            RoundedCornerShape(6.dp)
-                        )
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                )
+                if (isPro) {
+                    Text(
+                        text = "$currentCount ∞",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFFFA500),
+                        modifier = Modifier
+                            .background(Color(0xFFFFA500).copy(alpha = 0.1f), RoundedCornerShape(6.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                } else {
+                    val limit = com.nichihab.app.ui.commercial.CommercialTierManager.FREE_TIER_DAILY_TASK_LIMIT
+                    Text(
+                        text = "$currentCount/$limit",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = if (currentCount >= limit) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .background(
+                                if (currentCount >= limit) MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
+                                else MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                RoundedCornerShape(6.dp)
+                            )
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
                 }
                 TextButton(onClick = {
                     val todayTasks = state.tasks.size

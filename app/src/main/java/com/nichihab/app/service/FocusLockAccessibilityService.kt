@@ -68,8 +68,6 @@ class NichiHabAccessibilityService : AccessibilityService() {
 
     // Packages that Hard Mode should block (System Settings only — to prevent
     // disabling accessibility/overlay permissions during active sessions).
-    // Package installers and Play Store are NOT blocked — Device Admin API
-    // prevents uninstalling OUR app, while allowing other app uninstalls normally.
     private val hardModeBlockedPackages = setOf(
         // Android system settings
         "com.android.settings",
@@ -91,10 +89,7 @@ class NichiHabAccessibilityService : AccessibilityService() {
         // LG
         "com.lge.settings",
         // Sony
-        "com.sonymobile.settings",
-        // Package installers to prevent uninstall
-        "com.google.android.packageinstaller",
-        "com.android.packageinstaller"
+        "com.sonymobile.settings"
     )
 
     // Content descriptions no longer needed as we block based on 'NichiHab' keyword directly.
@@ -103,13 +98,10 @@ class NichiHabAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         serviceInfo = serviceInfo.apply {
-            eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
-                    AccessibilityEvent.TYPE_VIEW_CLICKED
+            eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
             feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC
             notificationTimeout = 100
-            flags = AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or 
-                    AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS or
-                    AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
+            flags = 0
         }
 
         // Cache strictness mode
@@ -262,15 +254,10 @@ class NichiHabAccessibilityService : AccessibilityService() {
 
         val packageName = event?.packageName?.toString() ?: return
 
-        // Handle both window state changes AND clicks (to detect navigation)
-        val isSignificantEvent = event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED || 
-                                event.eventType == AccessibilityEvent.TYPE_VIEW_CLICKED
-                                
-        val packageChanged = if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-            val changed = (packageName != currentActivePackage)
-            if (changed) currentActivePackage = packageName
-            changed
-        } else false
+        val isSignificantEvent = event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+
+        val packageChanged = (packageName != currentActivePackage)
+        if (packageChanged) currentActivePackage = packageName
 
         if (!isSignificantEvent) return
 

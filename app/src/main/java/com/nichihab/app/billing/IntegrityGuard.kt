@@ -24,7 +24,11 @@ data class IntegrityResult(
 object IntegrityGuard {
 
     private const val TAG = "IntegrityGuard"
-    private const val CLOUD_PROJECT_NUMBER = 0L
+
+    // TODO: Set this to your actual Google Cloud project number (not project ID)
+    // Found in: Google Cloud Console > IAM & Admin > Settings > Project number
+    // Or: Play Console > Play Integrity > Cloud project number
+    private const val CLOUD_PROJECT_NUMBER = 306337512308L
 
     suspend fun verifyIntegrity(context: Context): IntegrityResult {
         return withContext(Dispatchers.IO) {
@@ -42,7 +46,7 @@ object IntegrityGuard {
                 )
 
                 val token = tokenResponse.token()
-                decodeAndVerifyToken(token)
+                decodeAndVerifyToken(token, nonce)
             } catch (e: Exception) {
                 Log.w(TAG, "Integrity check failed: ${e.message}")
                 IntegrityResult(
@@ -57,18 +61,22 @@ object IntegrityGuard {
         return withContext(Dispatchers.IO) {
             try {
                 val integrityManager = IntegrityManagerFactory.create(context)
+                val nonce = generateNonce()
 
                 val tokenResponse: IntegrityTokenResponse = Tasks.await(
                     integrityManager.requestIntegrityToken(
                         IntegrityTokenRequest.builder()
                             .setCloudProjectNumber(CLOUD_PROJECT_NUMBER)
-                            .setNonce(purchaseToken)
+                            .setNonce(nonce)
                             .build()
                     )
                 )
 
                 val token = tokenResponse.token()
-                val result = decodeAndVerifyToken(token)
+                // Verify the nonce in the response matches what we sent
+                val result = decodeAndVerifyToken(token, nonce)
+                // Note: actual purchase token should be verified server-side
+                // with the Google Play Developer API for production
 
                 if (result.isIntegrityVerified) {
                     Log.d(TAG, "Purchase integrity verified successfully")
@@ -92,7 +100,7 @@ object IntegrityGuard {
         return Base64.encodeToString(random, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
     }
 
-    internal fun decodeAndVerifyToken(token: String): IntegrityResult {
+    internal fun decodeAndVerifyToken(token: String, expectedNonce: String? = null): IntegrityResult {
         return try {
             val parts = token.split(".")
             if (parts.size < 2) {
@@ -101,6 +109,15 @@ object IntegrityGuard {
 
             val payload = String(Base64.decode(parts[1], Base64.URL_SAFE))
             val json = JSONObject(payload)
+
+            // Verify nonce if provided (REPLAY PROTECTION)
+            if (expectedNonce != null) {
+                val tokenNonce = json.optString("nonce", "")
+                if (tokenNonce != expectedNonce) {
+                    Log.w(TAG, "Nonce mismatch: token nonce differs from expected")
+                    return IntegrityResult(false, errorMessage = "Nonce mismatch - possible replay attack")
+                }
+            }
 
             val deviceIntegrity = json.optJSONObject("deviceIntegrity")
             val passesDeviceIntegrity = deviceIntegrity

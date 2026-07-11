@@ -77,19 +77,6 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <!-- Device Admin (Anti-Uninstall Protection) -->
-        <receiver
-            android:name=".service.NichiHabDeviceAdmin"
-            android:exported="false"
-            android:permission="android.permission.BIND_DEVICE_ADMIN">
-            <meta-data
-                android:name="android.app.device_admin"
-                android:resource="@xml/device_admin" />
-            <intent-filter>
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-            </intent-filter>
-        </receiver>
-
         <!-- Boot Receiver -->
         <receiver
             android:name=".service.BootReceiver"

@@ -19,7 +19,7 @@ import com.nichihab.app.data.local.db.entity.VerificationEntity
         BlockedAppEntity::class
     ],
     version = 6,
-    exportSchema = false
+    exportSchema = true
 )
 abstract class NichiHabDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
