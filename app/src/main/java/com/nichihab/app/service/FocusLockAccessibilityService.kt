@@ -41,7 +41,7 @@ class NichiHabAccessibilityService : AccessibilityService() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var lastOverlayPackage: String? = null
-    private var overlayShowing = false
+    @Volatile private var overlayShowing = false
     private var lastOverlayLaunchTime = 0L
     private var cachedStrictnessMode: String = "normal"
 
@@ -245,7 +245,7 @@ class NichiHabAccessibilityService : AccessibilityService() {
         }
     }
 
-    private var currentActivePackage: String = ""
+    @Volatile private var currentActivePackage: String = ""
     private var smartTimerJob: kotlinx.coroutines.Job? = null
     private var enforcementJob: kotlinx.coroutines.Job? = null
 
